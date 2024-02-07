@@ -1,34 +1,64 @@
-require(
-  "dotenv"
-).config()
-const cors= require("cors")
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
+const express = require("express");
+require("dotenv").config(); //
+const path = require("path");
+const cookieParser = require("cookie-parser");
+const logger = require("morgan");
+const cors = require("cors"); //
+const mongoose = require("mongoose");
 
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
+const { sendResponse, AppError } = require("./src/helpers/utils");
+const indexRouter = require("./src/routes/index");
 
-var app = express();
+//
+const app = express();
 
-app.use(logger('dev'));
+app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
-app.use(cors())
+app.use(cors()); //
+app.use(express.static(path.join(__dirname, "public")));
 
-const mongoose = require("mongoose")
-/* DB connection*/
+// API
+app.use("/api", indexRouter); //
+
+// connect mongoose
 const mongoURI = process.env.MONGODB_URI;
-
 mongoose
   .connect(mongoURI)
-  .then(() => console.log(`DB connected ${mongoURI}`))
-  .catch((err) => console.log(err));
+  .then(() => console.log("DB connected"))
+  .catch((err) => console.log(err)); //
 
-app.use('/', indexRouter);
-// app.use('/users', usersRouter);
+// error handlers
+// catch 404
+app.use((req, res, next) => {
+  const err = new Error("Not found");
+  err.statusCode = 404;
+  next(err);
+});
+
+app.use((err, req, res, next) => {
+  console.log("Error", err);
+  if (err) {
+    // isOperational
+    return sendResponse(
+      res,
+      err.statusCode ? err.statusCode : 500,
+      false,
+      null,
+      { message: err.message },
+      err.errorType
+    );
+  } else {
+    return sendResponse(
+      res,
+      err.statusCode ? err.statusCode : 500,
+      false,
+      null,
+      { message: err.message },
+      "internal server error"
+    );
+  }
+});
 
 module.exports = app;
