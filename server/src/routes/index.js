@@ -9,6 +9,10 @@ const { sendResponse, AppError } = require("./src/helpers/utils");
 //   res.send({ status: "ok", data: "hello" }); //
 // });
 
+// adminApi
+const homeApi = require("./admin.api");
+router.use("/admin", adminApi);
+
 // homeApi
 const homeApi = require("./home.api");
 router.use("/home", homeApi);

@@ -1,0 +1,62 @@
+## General Requirements:
+### **1. Back-end requirements**
+
+| RESTful API | 
+• Design reasonable schemas and ERD (Entity Relationship Diagram)
+• Design and implement a RESTful API with appropriately named routes
+• Responses from the server must have a uniform structure
+• Implement soft delete with isDeleted for user data.
+• Validate all request inputs. 
+
+| Authentication | 
+• Implement user authentication using JSON Web Tokens (JWTs) or another secure authentication method, such as OAuth
+• Password must be encrypted. 
+
+| Documentation | 
+• Include a README file with:
+    ? Instructions on how to set up and run the API locally
+    ? API documentation on how to consume the API (ex: description and instruction for each route)
+    ? ERD  
+
+### **2. Front-end requirements**
+
+| User Interface | 
+• The application must have a responsive design that looks good on least 3 screen sizes: desktop, tablet, and mobile.
+• Theme changing feature (eg: Dark/Light mode).
+• Use Material UI. Customizing the MUI components with CSS is allowed. 
+
+| User Authentication | 
+• Implement persistent login. 
+
+| Form Validation | 
+• The project should implement client-side form validation to ensure that user input is valid before submitting it to the server. 
+
+| Error Handling | 
+• Implement error handling on the front-end to display error messages to users when something goes wrong on the server. 
+
+| Routing | 
+• Use React Router to handle client-side routing and allow users to navigate between pages without a full page refresh.
+• Each view must have its dedicated url path so that it is possible to share the current view by url between users. (Only required for non-protected routes).
+• Protected routes for pages where applicable.
+• The deployed version on Netlify must be able to navigate to pages by editing the url input box on the browser or hitting refresh button instead of showing 404 error. Hint: https://docs.netlify.com/routing/redirects/ 
+
+| Documentation | 
+•  Include a README file with:
+    ? Project description - a brief description of the purpose and main features
+    ? User Story
+    ? Instructions on how to set up and run the application locally
+    ? Third-party libraries used in the project 
+
+## **Deliverables**
+You are expected to submit a minimum of the following
+
+Item
+Notes
+Github link to Front-end code base
+Include README as instructed in FE requirements
+
+Github Link Back-end code base
+Include README as instructed in BE requirements
+
+Links to deployed application & server
+Netlify & Heroku (or other platforms as appropriate)

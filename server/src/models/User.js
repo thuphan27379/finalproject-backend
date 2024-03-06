@@ -13,13 +13,15 @@ const userSchema = Schema(
     password: { type: String, required: true, select: false },
 
     avatarUrl: { type: String, required: false, default: "" },
-    coverUrl: { type: String, required: false, default: "" },
+    coverUrl: { type: String, required: false, default: "" }, // company image/video
 
-    aboutMe: { type: String, required: false, default: "" },
+    aboutMe: { type: String, required: false, default: "" }, // short description
     city: { type: String, required: false, default: "" },
     country: { type: String, required: false, default: "" },
-    company: { type: String, required: false, default: "" },
-    jobTitle: { type: String, required: false, default: "" },
+    company: { type: String, required: false, default: "" }, //
+    jobTitle: { type: String, required: false, default: "" }, //
+    // document about product/service
+
     facebookLink: { type: String, required: false, default: "" },
     instagramLink: { type: String, required: false, default: "" },
     linkedinLink: { type: String, required: false, default: "" },
