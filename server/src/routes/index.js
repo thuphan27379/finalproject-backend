@@ -1,21 +1,20 @@
 const express = require("express");
 const router = express.Router();
 
-const { sendResponse, AppError } = require("./src/helpers/utils");
+const {
+  sendResponse,
+  AppError,
+} = require("C:/Users/Public/finalproject-backend/server/src/helpers/utils.js");
 
-// 
+//
 /* GET home page. */
 // router.get("/", function (req, res, next) {
 //   res.send({ status: "ok", data: "hello" }); //
 // });
 
-// adminApi
-const homeApi = require("./admin.api");
-router.use("/admin", adminApi);
-
 // homeApi
-const homeApi = require("./home.api");
-router.use("/home", homeApi);
+// const homeApi = require("./home.api");
+// router.use("/home", homeApi);
 
 // authApi
 const authApi = require("./auth.api");

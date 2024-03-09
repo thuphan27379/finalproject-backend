@@ -30,6 +30,7 @@ const userSchema = Schema(
     isDeleted: { type: Boolean, default: false, select: false },
     friendCount: { type: Number, default: 0 },
     postCount: { type: Number, default: 0 },
+    friendship: { type: Schema.ObjectId, required: true, ref: "Friend" }, // friend
   },
   { timestamps: true }
 );
