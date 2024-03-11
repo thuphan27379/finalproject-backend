@@ -27,7 +27,7 @@ const userSchema = Schema(
     linkedinLink: { type: String, required: false, default: "" },
     twitterLink: { type: String, required: false, default: "" },
     //
-    isDeleted: { type: Boolean, default: false, select: false },
+    isDeleted: { type: Boolean, default: false, select: false }, //soft delete
     friendCount: { type: Number, default: 0 },
     postCount: { type: Number, default: 0 },
     friendship: { type: Schema.ObjectId, required: true, ref: "Friend" }, // friend

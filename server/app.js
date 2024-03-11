@@ -19,11 +19,12 @@ app.use(cookieParser());
 app.use(cors()); //
 app.use(express.static(path.join(__dirname, "public")));
 
-// API
+// API connect
 app.use("/api", indexRouter); //
 
 // connect mongoose
 const mongoURI = process.env.MONGODB_URI;
+console.log(mongoURI);
 mongoose
   .connect(mongoURI)
   .then(() => console.log("DB connected"))
