@@ -11,14 +11,13 @@ authController.loginWithEmail = catchAsync(async (req, res, next) => {
   const { email, password } = req.body;
 
   //// business logic validation -kiem chung database
-  const user = await User.findOne({ email }, "password");
+  const user = await User.findOne({ email: email }, { email, password });
   if (!user) throw new AppError(400, "Invalid credentials", "login error");
 
   //// process -xu ly, check if match with data
   const isMatch = await bcrypt.compare(password, user.password);
   if (!isMatch) throw new AppError(400, "Wrong password", "login error");
   const accessToken = await user.generateToken();
-  console.log(accessToken);
 
   //// response result, success or not
   sendResponse(

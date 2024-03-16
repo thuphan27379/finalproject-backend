@@ -20,7 +20,7 @@ const authentication = require("../midlewares/authentication");
 // @body (name, email, password)
 // @access public
 router.post(
-  "/",
+  "/register",
   // verify data: email, pw
   validators.validate([
     body("name", "invalid name").exists().notEmpty(),
@@ -30,7 +30,6 @@ router.post(
       .normalizeEmail({ gmail_remove_dots: false }),
     body("password", "invalid password").exists().notEmpty(),
   ]),
-  //
   userController.register
 );
 
