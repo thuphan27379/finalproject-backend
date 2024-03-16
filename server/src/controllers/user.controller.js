@@ -19,15 +19,15 @@ userController.register = catchAsync(async (req, res, next) => {
   //// business logic validation - kiem chung database
   let user = await User.findOne({ email });
   if (user)
-    throw new AppError(400, "user already exists", "registration error");
+    throw new AppError(400, "User already exists", "Registration error");
 
-  //// process -xu ly
+  //// process - xu ly
   const salt = await bcrypt.genSalt(10); // ma hoa password
   password = await bcrypt.hash(password, salt);
 
   user = await User.create({ name, email, password }); // create a new account
 
-  const accessToken = await user.generateToken(); // authentication
+  const accessToken = await user.generateToken(); // authentication, user modal
 
   //// response result, success or not
   sendResponse(
@@ -36,7 +36,7 @@ userController.register = catchAsync(async (req, res, next) => {
     true,
     { user, accessToken },
     null,
-    "create user successfully"
+    "Create user successfully"
   );
   // } catch (error) {
   //   next(error);
@@ -45,14 +45,15 @@ userController.register = catchAsync(async (req, res, next) => {
   // res.send("user registration");
 });
 
-// get users with pagination////////////////////////
+// get users with pagination and filter////////////////////////
 userController.getUsers = catchAsync(async (req, res, next) => {
   // return res.send(req.userId);
   const currentUserId = req.userId;
+
   let { page, limit, ...filter } = { ...req.query };
 
-  page = parseInt(page) || 1;
-  limit = parseInt(limit) || 10;
+  page = parseInt(page) || 1; //page number
+  limit = parseInt(limit) || 10; //users per page
 
   const filterConditions = [{ isDeleted: false }];
   if (filter.name) {
@@ -65,20 +66,22 @@ userController.getUsers = catchAsync(async (req, res, next) => {
     ? { $and: filterConditions }
     : {};
 
-  const count = await User.countDocuments(filterCriteria);
+  const count = await User.countDocuments(filterCriteria); // dem so luong trong data
   const totalPages = Math.ceil(count / limit);
   const offset = limit * (page - 1);
 
   let users = await User.find(filterCriteria)
-    .sort({ createtAt: -1 })
+    .sort({ createdAt: -1 })
     .skip(offset)
     .limit(limit);
 
   console.log(users);
-  //
+
+  // // list of users !!!!!!!!!!!!!!!!!!!!!!!!
   // const promises = users.map(async (user) => {
   //   let temp = user.toJSON();
   //   temp.friendship = await Friend.findOne({
+  // // friend status ???
   //     $or: [
   //       { from: currentUserId, to: user._id },
   //       { from: user._id, to: currentUserId },
@@ -106,7 +109,7 @@ userController.getCurrentUser = catchAsync(async (req, res, next) => {
   //// business logic validation - kiem chung database
   const user = await User.findById(currentUserId);
   if (!user) {
-    throw new AppError(400, "user is not found", "get current user error");
+    throw new AppError(400, "User is not found", "Get current user error");
   }
 
   //// process -xu ly
@@ -118,7 +121,7 @@ userController.getCurrentUser = catchAsync(async (req, res, next) => {
     true, // success
     user, // data
     null, // error
-    "get current user successful" // message
+    "Get current user successful" // message
   );
 });
 
@@ -131,9 +134,9 @@ userController.getSingleUser = catchAsync(async (req, res, next) => {
   //// business logic validation - kiem chung database
   let user = await User.findById(userId);
   if (!user)
-    throw new AppError(400, "user is not found", "get single user error");
+    throw new AppError(400, "User is not found", "Get single user error");
 
-  // relationship of users, for UI
+  // relationship of users, for UI friend status
   user = user.toJSON();
   user.friendship = await Friend.findOne({
     $or: [
@@ -151,7 +154,7 @@ userController.getSingleUser = catchAsync(async (req, res, next) => {
     true, // success
     user, // data
     null, // error
-    "get single user successfully" // message
+    "Get single user successfully" // message
   );
 });
 
@@ -163,11 +166,11 @@ userController.updateProfile = catchAsync(async (req, res, next) => {
 
   //// business logic validation - kiem chung database
   if (currentUserId !== userId)
-    throw new AppError(400, "permission required", "update user error");
+    throw new AppError(400, "Permission required", "Update user error");
 
   let user = await User.findById(userId);
   if (!user) {
-    throw new AppError(400, "user is not found", "update user error");
+    throw new AppError(400, "User is not found", "Update user error");
   }
 
   //// process -xu ly
@@ -193,14 +196,14 @@ userController.updateProfile = catchAsync(async (req, res, next) => {
   });
   await user.save();
 
-  //// response result", success or not
+  //// response result, success or not
   return sendResponse(
     res, // res
     200, // status
     true, // success
     user, // data
     null, // error
-    "update user successfully" // message
+    "Update user successfully" // message
   );
 });
 

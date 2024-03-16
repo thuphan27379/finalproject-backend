@@ -6,7 +6,7 @@ const commentSchema = Schema(
   {
     content: { type: String, required: true },
     author: { type: Schema.ObjectId, required: true, ref: "User" },
-    post: { type: Schema.ObjectId, required: true, ref: "Blog" },
+    post: { type: Schema.ObjectId, required: true, ref: "Blog" }, //ref: "Post"
     //
     reactions: {
       like: { type: Number, default: 0 },
@@ -17,5 +17,4 @@ const commentSchema = Schema(
 );
 
 const Comment = mongoose.model("Comment", commentSchema);
-
 module.exports = Comment;

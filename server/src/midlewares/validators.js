@@ -5,6 +5,7 @@ const mongoose = require("mongoose");
 //
 const validators = {};
 
+// name, email, pw from login request
 validators.validate = (validationArray) => async (req, res, next) => {
   await Promise.all(validationArray.map((validation) => validation.run(req)));
   const errors = validationResult(req);
@@ -18,7 +19,7 @@ validators.validate = (validationArray) => async (req, res, next) => {
   return sendResponse(res, 422, false, null, message, "validation error");
 };
 
-//
+// param
 validators.checkObjectId = (paramId) => {
   if (!mongoose.Types.ObjectId.isValid(paramId)) {
     throw new Error("Invalid ObjectId");

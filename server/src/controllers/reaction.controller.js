@@ -6,12 +6,13 @@ const { sendResponse, AppError, catchAsync } = require("../helpers/utils");
 //
 const reactionController = {};
 
+// count reaction
 const calculateReactions = async (targetId, targetType) => {
   const stats = await Reaction.aggregate([
     { $match: { targetId: mongoose.Types.ObjectId(targetId) } },
     {
       $group: {
-        _id: "targetId",
+        _id: "$targetId",
         like: { $sum: { $cond: [{ $eq: ["emoji", "Like"] }, 1, 0] } },
         dislike: { $sum: { $cond: [{ $eq: ["emoji", "DisLike"] }, 1, 0] } },
       },
@@ -22,6 +23,7 @@ const calculateReactions = async (targetId, targetType) => {
     like: (stats[0] && stats[0].like) || 0,
     dislike: (stats[0] && stats[0].dislike) || 0,
   };
+
   await mongoose.model(targetType).findByIdAndUpdate(targetId, { reactions });
   return reactions;
 };
@@ -54,7 +56,7 @@ reactionController.saveReaction = catchAsync(async (req, res, next) => {
       emoji,
     });
   } else {
-    //// if there is a previous reation in the DB => compare the emojis
+    //// if there is a previous reaction in the DB => compare the emojis
     if (reaction.emoji === emoji) {
       //// if they are same => delete the reaction
       await reaction.delete();
@@ -74,7 +76,7 @@ reactionController.saveReaction = catchAsync(async (req, res, next) => {
     true,
     reactions,
     null,
-    "save reaction successfully"
+    "Save reaction successfully"
   );
 });
 

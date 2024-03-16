@@ -11,7 +11,7 @@ const indexRouter = require("./src/routes/index");
 
 //
 const app = express();
-
+console.log(process.env.PORT);
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));

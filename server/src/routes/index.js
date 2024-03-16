@@ -14,7 +14,7 @@ const {
 
 // homeApi
 // const homeApi = require("./home.api");
-// router.use("/home", homeApi);
+// router.use("/", homeApi);
 
 // authApi
 const authApi = require("./auth.api");

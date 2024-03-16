@@ -21,6 +21,7 @@ const authentication = require("../midlewares/authentication");
 // @access public
 router.post(
   "/",
+  // verify data: email, pw
   validators.validate([
     body("name", "invalid name").exists().notEmpty(),
     body("email", "invalid email")

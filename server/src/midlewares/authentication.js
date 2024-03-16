@@ -2,6 +2,7 @@ const { AppError } = require("../helpers/utils");
 const jwt = require("jsonwebtoken");
 const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY;
 
+//
 const authentication = {};
 
 authentication.loginRequired = (req, res, next) => {

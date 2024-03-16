@@ -7,6 +7,7 @@ const Friend = require("../models/Friend");
 //
 const postController = {};
 
+// post count
 const calculatePostCount = async (userId) => {
   const postCount = await Post.countDocuments({
     author: userId,
@@ -38,7 +39,7 @@ postController.createNewPost = catchAsync(async (req, res, next) => {
     true,
     post,
     null,
-    "create new post successfully"
+    "Create new post successfully"
   );
 });
 
@@ -50,9 +51,9 @@ postController.updateSinglePost = catchAsync(async (req, res, next) => {
 
   //// business logic validation - kiem chung database
   let post = await Post.findById(postId);
-  if (!post) throw new AppError(400, "post is not found", "update post error");
+  if (!post) throw new AppError(400, "Post is not found", "update post error");
   if (!post.author.equals(currentUserId))
-    throw new AppError(400, "only author can edit post", "update post error");
+    throw new AppError(400, "Only author can edit post", "update post error");
 
   //// process -xu ly
   const allows = ["content", "image"];
@@ -70,7 +71,7 @@ postController.updateSinglePost = catchAsync(async (req, res, next) => {
     true, // success post,
     post, // data
     null, // error
-    "update post successfully" // message
+    "Update post successfully" // message
   );
 });
 
@@ -83,7 +84,7 @@ postController.getSinglePost = catchAsync(async (req, res, next) => {
   //// business logic validation - kiem chung database
   let post = await Post.findById(postId);
   if (!post)
-    throw new AppError(400, "post is not found", "get single post error");
+    throw new AppError(400, "Post is not found", "get single post error");
 
   post = post.toJSON();
   post.comments = await Comment.find(post._id).populate("author");
@@ -96,7 +97,7 @@ postController.getSinglePost = catchAsync(async (req, res, next) => {
     true, // success
     post, // data
     null, // error
-    "get single post successfully" // message
+    "Get single post successfully" // message
   );
 });
 
@@ -105,7 +106,7 @@ postController.getPosts = catchAsync(async (req, res, next) => {
   // return res.send(req.userId);
   const currentUserId = req.userId;
   const userId = req.params.userId; //get userId of request
-  let { page, limit, ...filter } = { ...req.query };
+  let { page, limit } = { ...req.query };
 
   let user = await User.findById(userId); //check userId in database exist or not
   if (!user) throw new AppError(400, "user is not found", "get posts error");
@@ -113,13 +114,14 @@ postController.getPosts = catchAsync(async (req, res, next) => {
   page = parseInt(page) || 1; //page
   limit = parseInt(limit) || 10;
 
-  // find friends
+  // for find friends's ID to get friend's posts
   let userFriendIDs = await Friend.find({
     $or: [{ from: userId }, { to: userId }],
     status: "accepted",
   });
 
   if (userFriendIDs && userFriendIDs.length) {
+    // lay ra ~ id only of friends for array userFriendIDs
     userFriendIDs = userFriendIDs.map((friend) => {
       if (friend.from._id.equals(userId)) return friend.to;
       return friend.from;
@@ -146,7 +148,7 @@ postController.getPosts = catchAsync(async (req, res, next) => {
 
   // return posts and page
   let posts = await Post.find(filterCriteria)
-    .sort({ createtAt: -1 })
+    .sort({ createdAt: -1 })
     .skip(offset)
     .limit(limit)
     .populate("author");
@@ -163,7 +165,7 @@ postController.deleteSinglePost = catchAsync(async (req, res, next) => {
   //// business logic validation - kiem chung database
 
   //// process - xu ly
-  post = await Post.findByIdAndUpdate(
+  const post = await Post.findByIdAndUpdate(
     { _id: postId, author: currentUserId },
     { isDeleted: true },
     { new: true }
@@ -172,19 +174,20 @@ postController.deleteSinglePost = catchAsync(async (req, res, next) => {
   if (!post)
     throw new AppError(
       400,
-      "post not found or user not authorized",
+      "Post not found or user not authorized",
       "delete post error"
     );
+
   await calculatePostCount(currentUserId);
 
   //// response result, success or not
   return sendResponse(
     res, // res
     200, // status
-    true, // success post, // data
-    post,
+    true, // success post,
+    post, // data
     null, // error
-    "delete post successfully" // message
+    "Delete post successfully" // message
   );
 });
 
@@ -197,7 +200,7 @@ postController.getCommentsOfPost = catchAsync(async (req, res, next) => {
 
   //// business logic validation
   if (!post)
-    throw new AppError(404, "comments not found", "get comments of post error");
+    throw new AppError(404, "Comments not found", "get comments of post error");
 
   //// process
   const count = await Comment.countDocuments({ post: postId });
@@ -205,7 +208,7 @@ postController.getCommentsOfPost = catchAsync(async (req, res, next) => {
   const offset = limit * (page - 1);
 
   const comments = await Comment.find({ post: postId }).sort(
-    { createtAt: -1 }.limit(limit).populate("author")
+    { createdAt: -1 }.skip(offset).limit(limit).populate("author")
   );
 
   //// response result
@@ -215,7 +218,7 @@ postController.getCommentsOfPost = catchAsync(async (req, res, next) => {
     true,
     { comments, totalPages, count },
     null,
-    "get comments of post successfully"
+    "Get comments of post successfully"
   );
 });
 

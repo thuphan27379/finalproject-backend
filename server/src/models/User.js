@@ -1,8 +1,8 @@
 const mongoose = require("mongoose");
-const Schema = mongoose.Schema;
-const jwt = require("jsonwebtoken");
+const Schema = mongoose.Schema; //
+const jwt = require("jsonwebtoken"); //token
 
-const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY;
+const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY; //.env
 // const { response } = require("../app");
 
 //
@@ -30,7 +30,7 @@ const userSchema = Schema(
     isDeleted: { type: Boolean, default: false, select: false }, //soft delete
     friendCount: { type: Number, default: 0 },
     postCount: { type: Number, default: 0 },
-    friendship: { type: Schema.ObjectId, required: true, ref: "Friend" }, // friend
+    friendship: { type: Schema.ObjectId, ref: "Friend" }, // friend
   },
   { timestamps: true }
 );

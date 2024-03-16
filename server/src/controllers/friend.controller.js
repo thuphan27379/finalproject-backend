@@ -23,7 +23,7 @@ friendController.sendFriendRequest = catchAsync(async (req, res, next) => {
   // check DB
   const user = await User.findById(toUserId);
   if (!user)
-    throw new AppError(400, "user not found", "send friend request error");
+    throw new AppError(400, "User not found", "send friend request error");
 
   // check friend status
   let friend = await Friend.findOne({
@@ -49,19 +49,19 @@ friendController.sendFriendRequest = catchAsync(async (req, res, next) => {
         if (friend.from.equals(currentUserId)) {
           throw new AppError(
             400,
-            "you have already send request to this user",
+            "You have already send request to this user",
             "add friend error"
           );
         } else {
           throw new AppError(
             400,
-            "you have received a request from this user",
+            "You have received a request from this user",
             "add friend error"
           );
         }
       // status === accepted => error: already sent
       case "accepted":
-        throw new AppError(400, "users are already friend", "add friend error");
+        throw new AppError(400, "Users are already friend", "add friend error");
       // status === declined => update status to pending sent request, send again
       case "declined":
         friend.from = currentUserId;
@@ -75,7 +75,7 @@ friendController.sendFriendRequest = catchAsync(async (req, res, next) => {
           true,
           friend,
           null,
-          "send request successfully"
+          "Send request successfully"
         );
       default:
         throw new AppError(400, "friend status undefined", "add friend error");
@@ -100,11 +100,13 @@ friendController.getReceivedFriendRequestList = catchAsync(
     });
     //
     const filterConditions = [{ _id: { $in: requesterIDs } }];
+
     if (filter.name) {
       filterConditions.push({
         [name]: { $regrex: filter.name, $options: "i" },
       });
     }
+
     const filterCriteria = filterConditions.length
       ? { $and: filterConditions }
       : {};
@@ -152,17 +154,19 @@ friendController.getSentFriendRequestList = catchAsync(
       status: "pending",
     });
 
-    const receipientIDs = requestList.map((friend) => {
+    const recipientIDs = requestList.map((friend) => {
       if (friend.from._id.equals(currentUserId)) return friend.to;
       return friend.from;
     });
     //
-    const filterConditions = [{ _id: { $in: receipientIDs } }];
+    const filterConditions = [{ _id: { $in: recipientIDs } }];
+
     if (filter.name) {
       filterConditions.push({
         [name]: { $regrex: filter.name, $options: "i" },
       });
     }
+
     const filterCriteria = filterConditions.length
       ? { $and: filterConditions }
       : {};
@@ -215,11 +219,13 @@ friendController.getFriendList = catchAsync(async (req, res, next) => {
   });
   //
   const filterConditions = [{ _id: { $in: friendIDs } }];
+
   if (filter.name) {
     filterConditions.push({
       [name]: { $regrex: filter.name, $options: "i" },
     });
   }
+
   const filterCriteria = filterConditions.length
     ? { $and: filterConditions }
     : {};
@@ -263,6 +269,7 @@ friendController.reactFriendRequest = catchAsync(async (req, res, next) => {
   const fromUserId = req.params.userId; //from
   const { status } = req.body; //status: accepted OR declined
 
+  //
   let friend = await Friend.findOne({
     from: fromUserId,
     to: currentUserId,
@@ -272,23 +279,26 @@ friendController.reactFriendRequest = catchAsync(async (req, res, next) => {
   if (!friend)
     throw new AppError(
       400,
-      "friend request not found",
+      "Friend request not found",
       "react friend request error"
     );
   friend.status = status;
   await friend.save();
+
   if (status === "accepted") {
     //update friend count
     await calculatorFriendCount(currentUserId);
     await calculatorFriendCount(fromUserId);
   }
+
+  //
   return sendResponse(
     res,
     200,
     true,
     friend,
     null,
-    "react friend request successfully"
+    "React friend request successfully"
   );
 });
 
@@ -315,7 +325,7 @@ friendController.cancelFriendRequest = catchAsync(async (req, res, next) => {
     true,
     friend,
     null,
-    "friend request has been cancelled"
+    "Friend request has been cancelled"
   );
 });
 
@@ -324,6 +334,7 @@ friendController.removeFriend = catchAsync(async (req, res, next) => {
   const currentUserId = req.userId;
   const friendId = req.params.userId;
 
+  //
   const friend = await Friend.findOne({
     $or: [
       { from: currentUserId, to: friendId },
@@ -331,13 +342,16 @@ friendController.removeFriend = catchAsync(async (req, res, next) => {
     ],
     status: "accepted",
   });
+
   if (!friend)
     throw new AppError(400, "friend not found", "remove friend error");
   await friend.delete();
+
   //update friend count
   await calculatorFriendCount(currentUserId);
   await calculatorFriendCount(friendId);
 
+  //
   return sendResponse(res, 200, true, friend, null, "friend has been removed");
 });
 

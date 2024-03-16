@@ -14,8 +14,8 @@ router.post(
   "/requests",
   authentication.loginRequired,
   validators.validate([
-    body("id").exists().isString().custom(validators.checkObjectId),
-  ]),
+    body("to").exists().isString().custom(validators.checkObjectId),
+  ]), //body("id")
   friendController.sendFriendRequest
 );
 
@@ -40,9 +40,7 @@ router.get(
 // @route GET/friends
 // @description get list of friends
 // @access login required
-router.get("/", 
-  authentication.loginRequired,
-  friendController.getFriendList);
+router.get("/", authentication.loginRequired, friendController.getFriendList);
 
 // @route PUT/friends/requests/:userId
 // @description accept/reject a received pending request
