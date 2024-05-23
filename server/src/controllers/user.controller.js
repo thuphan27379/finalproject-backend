@@ -1,6 +1,4 @@
 const bcrypt = require("bcryptjs");
-const { Promise } = require("mongoose");
-
 const User = require("../models/User");
 const Friend = require("../models/Friend");
 const { sendResponse, AppError, catchAsync } = require("../helpers/utils");
@@ -27,17 +25,8 @@ userController.register = catchAsync(async (req, res, next) => {
 
   user = await User.create({ name, email, password }); // create a new account
 
-  const accessToken = await user.generateToken(); // authentication, user modal
-
   //// response result, success or not
-  sendResponse(
-    res,
-    200,
-    true,
-    { user, accessToken },
-    null,
-    "Create user successfully"
-  );
+  sendResponse(res, 200, true, { user }, null, "Create user successfully");
   // } catch (error) {
   //   next(error);
   // }

@@ -8,7 +8,7 @@ const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY; //.env
 //
 const userSchema = Schema(
   {
-    name: { type: String, required: true },
+    name: { type: String, required: false },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true, select: false },
 
