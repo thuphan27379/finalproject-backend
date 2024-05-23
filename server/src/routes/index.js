@@ -40,6 +40,10 @@ router.use("/friends", friendApi);
 const reactionApi = require("./reaction.api");
 router.use("/reactions", reactionApi);
 
+// groupApi
+const groupApi = require("./group.api");
+router.use("/group", groupApi);
+
 // ?!?!?! // error handlers
 router.get("/template/:test", async (req, res, next) => {
   const { test } = req.params;

@@ -60,6 +60,7 @@ reactionController.saveReaction = catchAsync(async (req, res, next) => {
     if (reaction.emoji === emoji) {
       //// if they are same => delete the reaction
       await reaction.delete();
+      console.log(reaction);
     } else {
       //// if they are different => update the reaction
       reaction.emoji = emoji;

@@ -18,7 +18,7 @@ router.post(
     body("targetId", "invalid targetId") //targetType trong codecomm-be
       .exists()
       .custom(validators.checkObjectId),
-    body("emoji", "invalid emoji").exists().isIn(["Like", "Dislike"]),
+    body("emoji", "invalid emoji").exists().isIn(["like", "dislike"]),
   ]),
   reactionController.saveReaction
 );

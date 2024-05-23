@@ -4,13 +4,15 @@ const jwt = require("jsonwebtoken");
 
 const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY;
 // const { response } = require("../app");
+const User = require("../models/User");
 
 //
 const groupSchema = Schema(
   {
-    name: { type: String, required: true },
-    description: { type: String, required: true },
-    members: { type: String, required: true, ref: "User" }, // (users ID)
+    creator: { type: Schema.Types.ObjectId, ref: User }, // (users ID)
+    name: { type: String, required: true }, //
+    description: { type: String, required: true }, //
+    members: [{ type: Schema.Types.ObjectId, ref: "User" }], // (users ID list)
     posts: { type: String, ref: "Group" }, // (post by member)?
     comments: { type: String }, //?
     reactions: { type: String }, //?
@@ -20,25 +22,26 @@ const groupSchema = Schema(
     isDeleted: { type: Boolean, default: false, select: false },
     memberCount: { type: Number, default: 0 },
     postCount: { type: Number, default: 0 },
+    reactionCount: { type: Number, default: 0 },
   },
   { timestamps: true }
 );
 
 // hide password in admin
-userSchema.methods.toJSON = function () {
-  const user = this._doc;
-  delete user.password;
-  delete user.isDeleted;
-  return user;
-};
+// userSchema.methods.toJSON = function () {
+//   const user = this._doc;
+//   delete user.password;
+//   delete user.isDeleted;
+//   return user;
+// };
 
 // authentication
-userSchema.methods.generateToken = async function () {
-  const accessToken = await jwt.sign({ _id: this._id }, JWT_SECRET_KEY, {
-    expiresIn: "1d",
-  });
-  return accessToken;
-};
+// userSchema.methods.generateToken = async function () {
+//   const accessToken = await jwt.sign({ _id: this._id }, JWT_SECRET_KEY, {
+//     expiresIn: "1d",
+//   });
+//   return accessToken;
+// };
 
 const Group = mongoose.model("Group", groupSchema);
 module.exports = Group;

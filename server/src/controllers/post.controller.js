@@ -21,6 +21,7 @@ postController.createNewPost = catchAsync(async (req, res, next) => {
   //// get data from requests - nhan yeu cau
   const currentUserId = req.userId;
   const { content, image } = req.body;
+
   //// business logic validation - kiem chung database
   //// process -xu ly
   let post = await Post.create({
@@ -32,6 +33,7 @@ postController.createNewPost = catchAsync(async (req, res, next) => {
   await calculatePostCount(currentUserId);
 
   post = await post.populate("author");
+
   //// response result, success or not
   return sendResponse(
     res,
@@ -194,23 +196,24 @@ postController.deleteSinglePost = catchAsync(async (req, res, next) => {
 // get comments of a post/////////////////////
 postController.getCommentsOfPost = catchAsync(async (req, res, next) => {
   //// get data from requests
-  const postId = res.params.id;
+  const postId = req.params.id;
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 10;
 
   //// business logic validation
-  if (!post)
-    throw new AppError(404, "Comments not found", "get comments of post error");
+  // if (!post)
+  //   throw new AppError(404, "Comments not found", "get comments of post error");
 
   //// process
   const count = await Comment.countDocuments({ post: postId });
   const totalPages = Math.ceil(count / limit);
   const offset = limit * (page - 1);
 
-  const comments = await Comment.find({ post: postId }).sort(
-    { createdAt: -1 }.skip(offset).limit(limit).populate("author")
-  );
-
+  const comments = await Comment.find({ post: postId })
+    .sort({ createdAt: -1 })
+    .skip(offset)
+    .limit(limit)
+    .populate("author");
   //// response result
   return sendResponse(
     res,

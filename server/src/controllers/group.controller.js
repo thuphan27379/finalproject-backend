@@ -8,3 +8,521 @@
 8. Display the posts in a group on the group page for all group members to see.
 9. Allow users to leave a group if they no longer want to be a member.
 10. Ensure that only members of a group can post in the group, and that non-members cannot view the group posts.*/
+
+const { Promise } = require("mongoose");
+const { sendResponse, AppError, catchAsync } = require("../helpers/utils");
+const { use } = require("../routes/group.api");
+
+const Group = require("../models/Group");
+const User = require("../models/User");
+const Post = require("../models/Post");
+const Comment = require("../models/Comment");
+const Reaction = require("../models/Reaction");
+const Friend = require("../models/Friend");
+// login require
+// how to member required?!?! check group.members co userId
+// create a test API for group
+// how to Group.members[]
+
+//
+const groupController = {};
+
+// groupsCount
+const calculateGroupsCount = async (groupId) => {
+  const groupsCount = await Group.countDocuments({
+    group: groupId, //?
+    isDeleted: false,
+  });
+  await Group.findByIdAndUpdate(groupId, { groupsCount });
+};
+
+// membersCount //Group.members[]???
+const calculateMembersCount = async (userId) => {
+  const membersCount = await Group.countDocuments({
+    group: groupId, //?
+    members: userId,
+    isDeleted: false,
+  });
+  await Group.findByIdAndUpdate(userId, { membersCount });
+};
+
+// postsCount ???
+const calculatePostsCount = async (groupId) => {
+  const postsCount = await Post.countDocuments({
+    group: groupId, //?
+    post: postId, //?
+    author: userId,
+    isDeleted: false,
+  });
+  await Group.findByIdAndUpdate(groupId, { postsCount });
+};
+
+// commentsCount ???
+const calculateCommentsCount = async (postId) => {
+  const commentsCount = await Group.countDocuments({
+    post: postId, //?
+    group: groupId, //?
+    author: userId, //?
+    isDeleted: false,
+  });
+  await Group.findByIdAndUpdate(postId, { commentsCount });
+};
+
+// reactionsCount ???
+const calculateReactions = async (targetId, targetType) => {
+  const stats = await Reaction.aggregate([
+    { $match: { targetId: mongoose.Types.ObjectId(targetId) } },
+    {
+      $group: {
+        _id: "$targetId",
+        like: { $sum: { $cond: [{ $eq: ["emoji", "Like"] }, 1, 0] } },
+        dislike: { $sum: { $cond: [{ $eq: ["emoji", "DisLike"] }, 1, 0] } },
+      },
+    },
+  ]);
+  // console.log(stats);
+  const reactions = {
+    like: (stats[0] && stats[0].like) || 0,
+    dislike: (stats[0] && stats[0].dislike) || 0,
+  };
+
+  await mongoose.model(targetType).findByIdAndUpdate(targetId, { reactions });
+  return reactions;
+};
+
+// create a new group - groupForm.js (fe)
+groupController.createNewGroup = catchAsync(async (req, res, next) => {
+  //// get data from requests - nhan yeu cau
+  const currentUserId = req.params.userId;
+  let { name, description, categories, interests } = req.body; //input
+
+  //// business logic validation - kiem chung database check posts exists
+  const user = User.findById(userId);
+  if (!user)
+    throw new AppError(
+      400,
+      "Only user logged in is able to create a group",
+      "Create new group error"
+    );
+
+  //// process - xu ly create new comment
+  let newGroup = await Group.create({
+    creator: currentUserId, //members
+    group: groupId, //?
+    name,
+    description,
+    categories,
+    interests,
+  });
+
+  // creator is a first members ???
+  // const memberArray = await Group.findByIdAndUpdate(
+  //   currentGroupId,
+  //   { $push: { members: currentUserId } },
+  //   { new: true }
+  // );
+
+  //// response result, success or not
+  return sendResponse(
+    res,
+    200,
+    true,
+    { newGroup },
+    null,
+    "Create a new group successfully"
+  );
+});
+
+// join a group
+groupController.joinGroup = catchAsync(async (req, res, next) => {
+  //// get data from requests
+  const currentUserId = req.params.userId;
+  const currentGroupId = req.params.groupId;
+
+  // lay array members trong Group ra, check co usedId hay k, neu k thi update .push them vo array, neu co thi bao join roi
+
+  //// business logic validation
+  const user = User.findById(userId);
+  if (!user)
+    throw new AppError(
+      400,
+      "User not found Or Only user logged in is able to join group",
+      "Join a group error"
+    );
+
+  const group = Group.findById(groupId);
+  if (!group) throw new AppError(400, "Group not found", "Join a group error");
+
+  //// process - update members list
+  const joinGroup = await Group.findByIdAndUpdate(
+    currentGroupId,
+    { $push: { members: currentUserId } },
+    { new: true }
+  );
+
+  //// response result
+  return sendResponse(
+    res,
+    200,
+    true,
+    { joinGroup },
+    null,
+    "Join a group successfully"
+  );
+});
+
+// leave a group .findByIdAndDelete(userId) in members []
+groupController.leaveGroup = catchAsync(async (req, res, next) => {
+  //// get data from requests
+  const currentUserId = req.params.userId;
+  const currentGroupId = req.params.groupId;
+
+  //// business logic validation
+  const user = User.findById(userId);
+  if (!user)
+    throw new AppError(
+      400,
+      "User not found Or Only user logged in is able to leave group",
+      "Leave a group error"
+    );
+
+  const group = Group.findById(groupId);
+  if (!group) throw new AppError(400, "Group not found", "Leave a group error");
+
+  //// process
+  const leaveGroup = await Group.findByIdAndDelete(
+    currentGroupId,
+    { $pull: { members: currentUserId } }, // ?!
+    { new: true }
+  );
+
+  //// response result
+  return sendResponse(
+    res,
+    200,
+    true,
+    { leaveGroup },
+    null,
+    "Leave a group successfully"
+  );
+});
+
+// create a new post in the group
+groupController.createNewGroupPost = catchAsync(async (req, res, next) => {
+  //// get data from requests
+  const currentUserId = req.params.userId;
+  const currentGroupId = req.params.groupId;
+  const { content, image } = req.body;
+
+  //// business logic validation
+  const user = User.findById(userId);
+  if (!user)
+    throw new AppError(
+      400,
+      "Only user logged in is able to post in the group",
+      "Create new post in the group error"
+    );
+
+  const group = Group.findById(groupId);
+  if (!group)
+    throw new AppError(
+      400,
+      "Group not found",
+      "Create a new post in the group error"
+    );
+
+  //// process
+  let post = await Post.create({
+    content,
+    image,
+    author: currentUserId,
+  });
+
+  await calculatePostCount(currentUserId);
+
+  post = await post.populate("author");
+
+  //// response result
+  return sendResponse(
+    res,
+    200,
+    true,
+    { post },
+    null,
+    "Create a new post in the group successfully"
+  );
+});
+
+// create a new comment on the post in the group
+groupController.createNewGroupComment = catchAsync(async (req, res, next) => {
+  //// get data from requests
+  const currentUserId = req.params.userId;
+  const currentGroupId = req.params.groupId;
+  const currentPostId = req.params.postId;
+  const { content, postId } = req.body;
+
+  //// business logic validation
+  const user = User.findById(userId);
+  if (!user)
+    throw new AppError(
+      400,
+      "Only user logged in is able to comment on the post in the group",
+      "Create a new comment on the post in the group error"
+    );
+
+  const group = Group.findById(groupId);
+  if (!group)
+    throw new AppError(
+      400,
+      "Group not found",
+      "Create a new comment on the post in the group error"
+    );
+
+  const post = Post.findById(postId);
+  if (!post)
+    throw new AppError(
+      400,
+      "Post not found",
+      "Create a new comment on the post in the group error"
+    );
+
+  //// process
+  let comment = await Comment.create({
+    author: currentUserId,
+    group: groupId,
+    post: postId,
+    content,
+  });
+
+  // update commentCount of the post
+  await calculateCommentCount(postId);
+  comment = await comment.populate("author");
+
+  //// response result
+  return sendResponse(
+    res,
+    200,
+    true,
+    { content },
+    null,
+    "Create a new comment in the post successfully"
+  );
+});
+
+// reaction on the post/comment in the group
+groupController.createNewGroupReactions = catchAsync(async (req, res, next) => {
+  //// get data from requests
+  const currentUserId = req.params.userId;
+  const { targetType, targetId, emoji } = req.body;
+
+  //// business logic validation
+  //// check targetType exists
+  const targetObj = await mongoose.model(targetType).findById(targetId);
+  if (!targetObj)
+    throw new AppError(400, `${targetType} not found`, "Create reaction error");
+
+  //// find the reaction if exists
+  let reaction = await Reaction.findOne({
+    targetType,
+    targetId,
+    author: currentUserId,
+  });
+
+  //// if there is no reaction in the DB => create a new one
+  if (!reaction) {
+    reaction = await Reaction.create({
+      targetType,
+      targetId,
+      author: currentUserId,
+      emoji,
+    });
+  } else {
+    //// if there is a previous reaction in the DB => compare the emojis
+    if (reaction.emoji === emoji) {
+      //// if they are same => delete the reaction
+      await reaction.delete();
+    } else {
+      //// if they are different => update the reaction
+      reaction.emoji = emoji;
+      await reaction.save();
+    }
+  }
+
+  const reactions = await calculateReactions(targetId, targetType);
+  //// process
+
+  //// response result
+  return sendResponse(
+    res,
+    200,
+    true,
+    { reactions },
+    null,
+    "Create reaction successfully"
+  );
+});
+
+// get groups list
+groupController.getListOfGroups = catchAsync(async (req, res, next) => {
+  //// get data from requests
+  const currentUserId = req.params.userId;
+  let { page, limit } = { ...req.query };
+
+  //// business logic validation
+  let user = await User.findById(userId); //check userId in database exist or not
+  if (!user)
+    throw new AppError(400, "User is not found", "Get groups list error");
+
+  page = parseInt(page) || 1; //page
+  limit = parseInt(limit) || 10;
+
+  //// process
+  // for find friends's ID to get friend's posts
+  let groupsId = await Group.find({}); //???
+
+  // for finding groups ???
+  const filterConditions = [
+    { isDeleted: false },
+    { author: { $in: groupIDs } },
+  ];
+
+  const filterCriteria = filterConditions.length
+    ? { $and: filterConditions }
+    : {};
+
+  // for pagination
+  const count = await Group.countDocuments(filterCriteria);
+  const totalPages = Math.ceil(count / limit);
+  const offset = limit * (page - 1);
+
+  // return groups and page ???
+  let groups = await Group.find(filterCriteria)
+    .sort({ createdAt: -1 })
+    .skip(offset)
+    .limit(limit)
+    .populate("author");
+
+  //// response result
+  return sendResponse(
+    res,
+    200,
+    true,
+    { groupsList },
+    null,
+    "Get list of groups successfully"
+  );
+});
+
+// get members list of the group
+groupController.getListOfMembers = catchAsync(async (req, res, next) => {
+  //// get data from requests
+  const currentUserId = req.params.userId;
+  const currentGroupId = req.params.groupId;
+
+  let members = []; //?!
+
+  let { page, limit } = { ...req.query };
+
+  //// business logic validation
+  let user = await User.findById(userId); //check userId in database exist or not
+  if (!user)
+    throw new AppError(400, "User is not found", "Get groups list error");
+
+  page = parseInt(page) || 1; //page
+  limit = parseInt(limit) || 10;
+
+  //// process
+  // for find friends's ID to get friend's posts
+  let groupsId = await Group.find({}); //???
+
+  // for finding groups ???
+  const filterConditions = [
+    { isDeleted: false },
+    { author: { $in: groupIDs } },
+  ];
+
+  const filterCriteria = filterConditions.length
+    ? { $and: filterConditions }
+    : {};
+
+  // for pagination
+  const count = await Group.countDocuments(filterCriteria);
+  const totalPages = Math.ceil(count / limit);
+  const offset = limit * (page - 1);
+
+  // return groups and page ???
+  let groups = await Group.find(filterCriteria)
+    .sort({ createdAt: -1 })
+    .skip(offset)
+    .limit(limit)
+    .populate("author");
+
+  //// response result
+  return sendResponse(
+    res,
+    200,
+    true,
+    { membersList },
+    null,
+    "Get list of members successfully"
+  );
+});
+
+// get posts list in the group
+groupController.getListOfPosts = catchAsync(async (req, res, next) => {
+  //// get data from requests
+  const currentUserId = req.params.userId;
+  const currentGroupId = req.params.groupId;
+  const currentPostId = req.params.postId;
+
+  //// business logic validation
+
+  //// process
+
+  //// response result
+  return sendResponse(
+    res,
+    200,
+    true,
+    { postsList },
+    null,
+    "Get list of posts successfully"
+  );
+});
+
+// get comments list of the post in the group
+groupController.getListOfComments = catchAsync(async (req, res, next) => {
+  //// get data from requests
+  const currentUserId = req.params.userId;
+  const currentGroupId = req.params.groupId;
+  const currentPostId = req.params.postId;
+
+  let { page, limit } = { ...req.query };
+
+  //// business logic validation
+  let user = await User.findById(userId); //check userId in database exist or not
+  if (!user)
+    throw new AppError(400, "User is not found", "Get groups list error");
+
+  page = parseInt(page) || 1; //page
+  limit = parseInt(limit) || 10;
+
+  //// process
+
+  // for pagination
+  const totalPages = Math.ceil(count / limit);
+  const offset = limit * (page - 1);
+
+  //// response result
+  return sendResponse(
+    res,
+    200,
+    true,
+    { commentsList },
+    null,
+    "Get comments list successfully"
+  );
+});
+
+//
+module.exports = groupController;

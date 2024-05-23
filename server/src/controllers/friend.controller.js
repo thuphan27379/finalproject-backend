@@ -7,7 +7,7 @@ const friendController = {};
 
 // calculate total friend
 const calculatorFriendCount = async (userId) => {
-  const friendCount = await Friend.countDocument({
+  const friendCount = await Friend.countDocuments({
     $or: [{ from: userId }, { to: userId }],
     status: "accepted",
   });
@@ -113,7 +113,7 @@ friendController.getReceivedFriendRequestList = catchAsync(
     //
     page = parseInt(page) || 1;
     limit = parseInt(limit) || 10;
-    const count = await User.countDocument(filterCriteria);
+    const count = await User.countDocuments(filterCriteria);
     const totalPages = Math.ceil(count / limit);
     const offset = limit * (page - 1);
 
@@ -124,7 +124,7 @@ friendController.getReceivedFriendRequestList = catchAsync(
     //
     const usersWithFriendship = users.map((user) => {
       let temp = user.toJSON();
-      temp.friendship = friendList.find((friendship) => {
+      temp.friendship = requestList.find((friendship) => {
         if (friendship.from.equals(user._id) || friendship.to.equals(user._id))
           return { status: friendship.status };
         return false;
@@ -173,7 +173,7 @@ friendController.getSentFriendRequestList = catchAsync(
     //
     page = parseInt(page) || 1;
     limit = parseInt(limit) || 10;
-    const count = await User.countDocument(filterCriteria);
+    const count = await User.countDocuments(filterCriteria);
     const totalPages = Math.ceil(count / limit);
     const offset = limit * (page - 1);
 
@@ -184,7 +184,7 @@ friendController.getSentFriendRequestList = catchAsync(
     //
     const usersWithFriendship = users.map((user) => {
       let temp = user.toJSON();
-      temp.friendship = friendList.find((friendship) => {
+      temp.friendship = requestList.find((friendship) => {
         if (friendship.from.equals(user._id) || friendship.to.equals(user._id))
           return { status: friendship.status };
         return false;
@@ -232,7 +232,7 @@ friendController.getFriendList = catchAsync(async (req, res, next) => {
   //
   page = parseInt(page) || 1;
   limit = parseInt(limit) || 10;
-  const count = await User.countDocument(filterCriteria);
+  const count = await User.countDocuments(filterCriteria);
   const totalPages = Math.ceil(count / limit);
   const offset = limit * (page - 1);
 
