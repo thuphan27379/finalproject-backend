@@ -9,11 +9,11 @@ const { sendResponse, AppError } = require("../helpers/utils");
 
 //
 /* GET home page. */
-// router.get("/", function (req, res, next) {
-//   res.send({ status: "ok", data: "hello" }); //
-// });
+router.get("/", function (req, res, next) {
+  res.send({ status: "ok", data: "hello" }); //
+});
 
-// homeApi
+// homeApi // company
 // const homeApi = require("./home.api");
 // router.use("/", homeApi);
 
