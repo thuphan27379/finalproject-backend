@@ -10,9 +10,9 @@
 10. Ensure that only members of a group can post in the group, and that non-members cannot view the group posts.*/
 
 const { Promise } = require("mongoose");
+
 const { sendResponse, AppError, catchAsync } = require("../helpers/utils");
 const { use } = require("../routes/group.api");
-
 const Group = require("../models/Group");
 const User = require("../models/User");
 const Post = require("../models/Post");
@@ -37,14 +37,15 @@ const calculateGroupsCount = async (groupId) => {
 };
 
 // membersCount //Group.members[]???
-const calculateMembersCount = async (userId) => {
-  const membersCount = await Group.countDocuments({
-    group: groupId, //?
-    members: userId,
-    isDeleted: false,
-  });
-  await Group.findByIdAndUpdate(userId, { membersCount });
-};
+// const calculateMembersCount = async (userId) => {
+//   const membersCount = await Group.countDocuments({
+//     members: userId,
+//     isDeleted: false,
+//   });
+
+//   console.log(membersCount);
+//   await Group.findByIdAndUpdate(userId, { membersCount });
+// };
 
 // postsCount ???
 const calculatePostsCount = async (groupId) => {
@@ -93,11 +94,11 @@ const calculateReactions = async (targetId, targetType) => {
 // create a new group - groupForm.js (fe)
 groupController.createNewGroup = catchAsync(async (req, res, next) => {
   //// get data from requests - nhan yeu cau
-  const currentUserId = req.params.userId;
-  let { name, description, categories, interests } = req.body; //input
+  const currentUserId = req.userId;
+  let { name, description, interests } = req.body; //input
 
-  //// business logic validation - kiem chung database check posts exists
-  const user = User.findById(userId);
+  //// business logic validation
+  const user = User.findById(currentUserId);
   if (!user)
     throw new AppError(
       400,
@@ -105,22 +106,21 @@ groupController.createNewGroup = catchAsync(async (req, res, next) => {
       "Create new group error"
     );
 
-  //// process - xu ly create new comment
+  //// process - xu ly
   let newGroup = await Group.create({
     creator: currentUserId, //members
-    group: groupId, //?
     name,
     description,
-    categories,
-    interests,
+    interests, // cung la array
   });
+  console.log(currentUserId);
 
-  // creator is a first members ???
-  // const memberArray = await Group.findByIdAndUpdate(
-  //   currentGroupId,
-  //   { $push: { members: currentUserId } },
-  //   { new: true }
-  // );
+  // creator is a first member ???
+  const memberArray = await Group.findOneAndUpdate(
+    newGroup._id,
+    { $push: { members: currentUserId } },
+    { new: true }
+  );
 
   //// response result, success or not
   return sendResponse(
@@ -142,7 +142,7 @@ groupController.joinGroup = catchAsync(async (req, res, next) => {
   // lay array members trong Group ra, check co usedId hay k, neu k thi update .push them vo array, neu co thi bao join roi
 
   //// business logic validation
-  const user = User.findById(userId);
+  const user = User.findById(currentUserId);
   if (!user)
     throw new AppError(
       400,
@@ -150,8 +150,12 @@ groupController.joinGroup = catchAsync(async (req, res, next) => {
       "Join a group error"
     );
 
-  const group = Group.findById(groupId);
+  const group = Group.findById(currentGroupId);
   if (!group) throw new AppError(400, "Group not found", "Join a group error");
+
+  // check join chua
+  if (group.members.includes(currentUserId))
+    throw new AppError(400, "User already join", "Join group error");
 
   //// process - update members list
   const joinGroup = await Group.findByIdAndUpdate(
@@ -174,8 +178,8 @@ groupController.joinGroup = catchAsync(async (req, res, next) => {
 // leave a group .findByIdAndDelete(userId) in members []
 groupController.leaveGroup = catchAsync(async (req, res, next) => {
   //// get data from requests
-  const currentUserId = req.params.userId;
-  const currentGroupId = req.params.groupId;
+  const currentUserId = req.userId;
+  const currentGroupId = req.groupId;
 
   //// business logic validation
   const user = User.findById(userId);
@@ -210,8 +214,8 @@ groupController.leaveGroup = catchAsync(async (req, res, next) => {
 // create a new post in the group
 groupController.createNewGroupPost = catchAsync(async (req, res, next) => {
   //// get data from requests
-  const currentUserId = req.params.userId;
-  const currentGroupId = req.params.groupId;
+  const currentUserId = req.userId;
+  const currentGroupId = req.groupId;
   const { content, image } = req.body;
 
   //// business logic validation
@@ -230,6 +234,8 @@ groupController.createNewGroupPost = catchAsync(async (req, res, next) => {
       "Group not found",
       "Create a new post in the group error"
     );
+
+  // check member join
 
   //// process
   let post = await Post.create({
@@ -256,9 +262,9 @@ groupController.createNewGroupPost = catchAsync(async (req, res, next) => {
 // create a new comment on the post in the group
 groupController.createNewGroupComment = catchAsync(async (req, res, next) => {
   //// get data from requests
-  const currentUserId = req.params.userId;
-  const currentGroupId = req.params.groupId;
-  const currentPostId = req.params.postId;
+  const currentUserId = req.userId;
+  const currentGroupId = req.groupId;
+  const currentPostId = req.postId;
   const { content, postId } = req.body;
 
   //// business logic validation
@@ -286,6 +292,8 @@ groupController.createNewGroupComment = catchAsync(async (req, res, next) => {
       "Create a new comment on the post in the group error"
     );
 
+  // check member join
+
   //// process
   let comment = await Comment.create({
     author: currentUserId,
@@ -312,8 +320,10 @@ groupController.createNewGroupComment = catchAsync(async (req, res, next) => {
 // reaction on the post/comment in the group
 groupController.createNewGroupReactions = catchAsync(async (req, res, next) => {
   //// get data from requests
-  const currentUserId = req.params.userId;
+  const currentUserId = req.userId;
   const { targetType, targetId, emoji } = req.body;
+
+  // check member join
 
   //// business logic validation
   //// check targetType exists
@@ -365,7 +375,7 @@ groupController.createNewGroupReactions = catchAsync(async (req, res, next) => {
 // get groups list
 groupController.getListOfGroups = catchAsync(async (req, res, next) => {
   //// get data from requests
-  const currentUserId = req.params.userId;
+  const currentUserId = req.userId;
   let { page, limit } = { ...req.query };
 
   //// business logic validation
@@ -416,8 +426,8 @@ groupController.getListOfGroups = catchAsync(async (req, res, next) => {
 // get members list of the group
 groupController.getListOfMembers = catchAsync(async (req, res, next) => {
   //// get data from requests
-  const currentUserId = req.params.userId;
-  const currentGroupId = req.params.groupId;
+  const currentUserId = req.userId;
+  const currentGroupId = req.groupId;
 
   let members = []; //?!
 
@@ -471,9 +481,9 @@ groupController.getListOfMembers = catchAsync(async (req, res, next) => {
 // get posts list in the group
 groupController.getListOfPosts = catchAsync(async (req, res, next) => {
   //// get data from requests
-  const currentUserId = req.params.userId;
-  const currentGroupId = req.params.groupId;
-  const currentPostId = req.params.postId;
+  const currentUserId = req.userId;
+  const currentGroupId = req.groupId;
+  const currentPostId = req.postId;
 
   //// business logic validation
 
@@ -493,9 +503,9 @@ groupController.getListOfPosts = catchAsync(async (req, res, next) => {
 // get comments list of the post in the group
 groupController.getListOfComments = catchAsync(async (req, res, next) => {
   //// get data from requests
-  const currentUserId = req.params.userId;
-  const currentGroupId = req.params.groupId;
-  const currentPostId = req.params.postId;
+  const currentUserId = req.userId;
+  const currentGroupId = req.groupId;
+  const currentPostId = req.postId;
 
   let { page, limit } = { ...req.query };
 

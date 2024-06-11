@@ -48,7 +48,7 @@ router.post(
 // @body (userId, groupId)
 // @access login required
 router.put(
-  "/",
+  "/:groupId/:userId",
   authentication.loginRequired,
   validators.validate([
     param("userId").exists().isString().custom(validators.checkObjectId),

@@ -9,20 +9,16 @@ const User = require("../models/User");
 //
 const groupSchema = Schema(
   {
-    creator: { type: Schema.Types.ObjectId, ref: User }, // (users ID)
+    creator: { type: Schema.Types.ObjectId, ref: "User" }, // (users ID)
     name: { type: String, required: true }, //
     description: { type: String, required: true }, //
     members: [{ type: Schema.Types.ObjectId, ref: "User" }], // (users ID list)
-    posts: { type: String, ref: "Group" }, // (post by member)?
-    comments: { type: String }, //?
-    reactions: { type: String }, //?
-    categories: { type: String, required: true, enum: ["home spa", "nature"] },
-    interests: { type: String, required: true, enum: ["family", "english"] },
+    posts: [{ type: Schema.Types.ObjectId, ref: "Post" }], // (post by member)?
+    interests: { type: String, required: true }, // cung la array
     //
     isDeleted: { type: Boolean, default: false, select: false },
-    memberCount: { type: Number, default: 0 },
+    // memberCount: { type: Number, default: 0 },
     postCount: { type: Number, default: 0 },
-    reactionCount: { type: Number, default: 0 },
   },
   { timestamps: true }
 );

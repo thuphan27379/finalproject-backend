@@ -8,17 +8,17 @@ const reactionController = require("../controllers/reaction.controller");
 
 // @route POST/reactions
 // @description reaction a post and comment
-// @body {targetType: 'post' or 'comment', targetId, emoji: 'like' or 'dislike'}
+// @body {targetType: 'Post' or 'Comment', targetId, emoji: 'like' or 'dislike'}
 // @access login required
 router.post(
   "/",
   authentication.loginRequired,
   validators.validate([
-    body("targetType", "invalid targetType").exists().isIn(["Post", "Comment"]),
-    body("targetId", "invalid targetId") //targetType trong codecomm-be
+    body("targetType", "Invalid targetType").exists().isIn(["Post", "Comment"]),
+    body("targetId", "Invalid targetId") //targetType trong codecomm-be
       .exists()
       .custom(validators.checkObjectId),
-    body("emoji", "invalid emoji").exists().isIn(["like", "dislike"]),
+    body("emoji", "Invalid emoji").exists().isIn(["like", "dislike"]),
   ]),
   reactionController.saveReaction
 );

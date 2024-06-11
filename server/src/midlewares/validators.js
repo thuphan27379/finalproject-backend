@@ -1,6 +1,8 @@
-const { sendResponse } = require("../helpers/utils");
 const { validationResult } = require("express-validator");
+// https://www.npmjs.com/package/express-validation
 const mongoose = require("mongoose");
+
+const { sendResponse } = require("../helpers/utils");
 
 //
 const validators = {};
@@ -11,6 +13,7 @@ validators.validate = (validationArray) => async (req, res, next) => {
   const errors = validationResult(req);
   if (errors.isEmpty()) return next();
 
+  // error
   const message = errors
     .array()
     .map((error) => error.msg)

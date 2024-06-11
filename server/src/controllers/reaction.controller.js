@@ -9,22 +9,35 @@ const reactionController = {};
 // count reaction
 const calculateReactions = async (targetId, targetType) => {
   const stats = await Reaction.aggregate([
-    { $match: { targetId: mongoose.Types.ObjectId(targetId) } },
+    {
+      $match: {
+        targetId: mongoose.Types.ObjectId.createFromHexString(targetId),
+      },
+    },
     {
       $group: {
         _id: "$targetId",
-        like: { $sum: { $cond: [{ $eq: ["emoji", "Like"] }, 1, 0] } },
-        dislike: { $sum: { $cond: [{ $eq: ["emoji", "DisLike"] }, 1, 0] } },
+        like: {
+          $sum: {
+            $cond: [{ $eq: ["$emoji", "like"] }, 1, 0],
+          },
+        },
+        dislike: {
+          $sum: {
+            $cond: [{ $eq: ["$emoji", "dislike"] }, 1, 0],
+          },
+        },
       },
     },
   ]);
-  // console.log(stats);
+
+  // update UI & save
   const reactions = {
     like: (stats[0] && stats[0].like) || 0,
     dislike: (stats[0] && stats[0].dislike) || 0,
   };
-
   await mongoose.model(targetType).findByIdAndUpdate(targetId, { reactions });
+
   return reactions;
 };
 
@@ -36,9 +49,9 @@ reactionController.saveReaction = catchAsync(async (req, res, next) => {
 
   //// process:
   //// check targetType exists
-  const targetObj = await mongoose.model(targetType).findById(targetId);
+  const targetObj = await mongoose.model(targetType).findById(targetId); // tra ve la Post hoac Comment
   if (!targetObj)
-    throw new AppError(400, `${targetType} not found`, "create reaction error");
+    throw new AppError(400, `${targetType} not found`, "Create reaction error");
 
   //// find the reaction if exists
   let reaction = await Reaction.findOne({
@@ -59,8 +72,8 @@ reactionController.saveReaction = catchAsync(async (req, res, next) => {
     //// if there is a previous reaction in the DB => compare the emojis
     if (reaction.emoji === emoji) {
       //// if they are same => delete the reaction
-      await reaction.delete();
-      console.log(reaction);
+      await reaction.deleteOne();
+      // console.log(reaction);
     } else {
       //// if they are different => update the reaction
       reaction.emoji = emoji;
@@ -69,6 +82,7 @@ reactionController.saveReaction = catchAsync(async (req, res, next) => {
   }
 
   const reactions = await calculateReactions(targetId, targetType);
+  console.log(reactions);
 
   //// response result:
   return sendResponse(

@@ -16,14 +16,14 @@ const calculatePostCount = async (userId) => {
   await User.findByIdAndUpdate(userId, { postCount });
 };
 
-// create a new post//////////////////
+// create a new post//
 postController.createNewPost = catchAsync(async (req, res, next) => {
-  //// get data from requests - nhan yeu cau
+  // get data from requests - nhan yeu cau
   const currentUserId = req.userId;
   const { content, image } = req.body;
 
-  //// business logic validation - kiem chung database
-  //// process -xu ly
+  // business logic validation - kiem chung database
+  // process -xu ly
   let post = await Post.create({
     content,
     image,
@@ -34,7 +34,7 @@ postController.createNewPost = catchAsync(async (req, res, next) => {
 
   post = await post.populate("author");
 
-  //// response result, success or not
+  // response result, success or not
   return sendResponse(
     res,
     200,
@@ -45,19 +45,19 @@ postController.createNewPost = catchAsync(async (req, res, next) => {
   );
 });
 
-// update a single post////////////////////////////
+// update a single post//
 postController.updateSinglePost = catchAsync(async (req, res, next) => {
-  //// get data from requests - nhan yeu cau
+  // get data from requests - nhan yeu cau
   const currentUserId = req.userId;
   const postId = req.params.id;
 
-  //// business logic validation - kiem chung database
+  // business logic validation - kiem chung database
   let post = await Post.findById(postId);
-  if (!post) throw new AppError(400, "Post is not found", "update post error");
+  if (!post) throw new AppError(400, "Post is not found", "Update post error");
   if (!post.author.equals(currentUserId))
-    throw new AppError(400, "Only author can edit post", "update post error");
+    throw new AppError(400, "Only author can edit post", "Update post error");
 
-  //// process -xu ly
+  // process - xu ly
   const allows = ["content", "image"];
   allows.forEach((field) => {
     if (req.body[field] !== undefined) {
@@ -66,7 +66,7 @@ postController.updateSinglePost = catchAsync(async (req, res, next) => {
   });
   await post.save();
 
-  //// response result", success or not
+  // response result", success or not
   return sendResponse(
     res, // res
     200, // status
@@ -77,22 +77,22 @@ postController.updateSinglePost = catchAsync(async (req, res, next) => {
   );
 });
 
-// get a single post////////////////////////////
+// get a single post//
 postController.getSinglePost = catchAsync(async (req, res, next) => {
-  //// get data from requests - nhan yeu cau
+  // get data from requests - nhan yeu cau
   const currentUserId = req.userId;
   const postId = req.params.id;
 
-  //// business logic validation - kiem chung database
+  // business logic validation - kiem chung database
   let post = await Post.findById(postId);
   if (!post)
-    throw new AppError(400, "Post is not found", "get single post error");
+    throw new AppError(400, "Post is not found", "Get single post error");
 
+  // process - xu ly
   post = post.toJSON();
   post.comments = await Comment.find(post._id).populate("author");
 
-  //// process -xu ly
-  //// response result, success or not
+  // response result, success or not
   return sendResponse(
     res, // res
     200, // status
@@ -103,16 +103,19 @@ postController.getSinglePost = catchAsync(async (req, res, next) => {
   );
 });
 
-// get all posts and user can see with pagination ////////////////////////
+// get all posts and user can see with pagination //
 postController.getPosts = catchAsync(async (req, res, next) => {
+  // get data from requests - nhan yeu cau
   // return res.send(req.userId);
   const currentUserId = req.userId;
   const userId = req.params.userId; //get userId of request
   let { page, limit } = { ...req.query };
 
+  // business logic validation - kiem chung database
   let user = await User.findById(userId); //check userId in database exist or not
   if (!user) throw new AppError(400, "user is not found", "get posts error");
 
+  // process - xu ly
   page = parseInt(page) || 1; //page
   limit = parseInt(limit) || 10;
 
@@ -154,35 +157,35 @@ postController.getPosts = catchAsync(async (req, res, next) => {
     .skip(offset)
     .limit(limit)
     .populate("author");
-  //
+
+  // response result, success or not
   return sendResponse(res, 200, true, { posts, totalPages, count }, null, "");
 });
 
-// delete a post /////////////////
+// delete a post // soft
 postController.deleteSinglePost = catchAsync(async (req, res, next) => {
-  //// get data from requests - nhan yeu cau
+  // get data from requests - nhan yeu cau
   const currentUserId = req.userId;
   const postId = req.params.id;
 
-  //// business logic validation - kiem chung database
-
-  //// process - xu ly
+  // business logic validation - kiem chung database
+  // process - xu ly
   const post = await Post.findByIdAndUpdate(
     { _id: postId, author: currentUserId },
     { isDeleted: true },
-    { new: true }
+    { new: true } //sau do tra lai 1 object moi
   );
 
   if (!post)
     throw new AppError(
       400,
       "Post not found or user not authorized",
-      "delete post error"
+      "Delete post error"
     );
 
   await calculatePostCount(currentUserId);
 
-  //// response result, success or not
+  // response result, success or not
   return sendResponse(
     res, // res
     200, // status
@@ -193,14 +196,14 @@ postController.deleteSinglePost = catchAsync(async (req, res, next) => {
   );
 });
 
-// get comments of a post/////////////////////
+// get comments of a post//
 postController.getCommentsOfPost = catchAsync(async (req, res, next) => {
-  //// get data from requests
+  // get data from requests
   const postId = req.params.id;
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 10;
 
-  //// business logic validation
+  // business logic validation
   // if (!post)
   //   throw new AppError(404, "Comments not found", "get comments of post error");
 
@@ -214,7 +217,7 @@ postController.getCommentsOfPost = catchAsync(async (req, res, next) => {
     .skip(offset)
     .limit(limit)
     .populate("author");
-  //// response result
+  // response result
   return sendResponse(
     res,
     200,

@@ -16,18 +16,18 @@ const calculateCommentCount = async (postId) => {
   await Post.findByIdAndUpdate(postId, { commentCount });
 };
 
-// create a new comment//////////////////////////////
+// create a new comment//
 commentController.createNewComment = catchAsync(async (req, res, next) => {
-  //// get data from requests - nhan yeu cau
+  // get data from requests - nhan yeu cau
   const currentUserId = req.userId;
   const { content, postId } = req.body;
 
-  //// business logic validation - kiem chung database check posts exists
+  // business logic validation - kiem chung database check posts exists
   const post = Post.findById(postId);
   if (!post)
-    throw new AppError(400, "Post not found", "create new comment error");
+    throw new AppError(400, "Post not found", "Create new comment error");
 
-  //// process - xu ly create new comment
+  // process - xu ly
   let comment = await Comment.create({
     author: currentUserId,
     post: postId,
@@ -38,7 +38,7 @@ commentController.createNewComment = catchAsync(async (req, res, next) => {
   await calculateCommentCount(postId);
   comment = await comment.populate("author");
 
-  //// response result, success or not
+  // response result, success or not
   return sendResponse(
     res,
     200,
@@ -49,29 +49,29 @@ commentController.createNewComment = catchAsync(async (req, res, next) => {
   );
 });
 
-// update a comment/////////////////////////// NOT YET, edit btn
+// update a comment// NOT YET, edit btn
 commentController.updateSingleComment = catchAsync(async (req, res, next) => {
-  //// get data from requests
+  // get data from requests
   const currentUserId = req.userId;
   const commentId = req.params.id;
   const { content } = req.body;
 
-  //// process
+  // process
   const comment = await Comment.findOneAndUpdate(
     { _id: commentId, author: currentUserId },
     { content },
     { new: true }
   );
 
-  //// business logic validation
+  // business logic validation
   if (!comment)
     throw new AppError(
       400,
       "Comment not found or user not authorized",
-      "update comment error"
+      "Update comment error"
     );
 
-  //// response result
+  // response result
   return sendResponse(
     res,
     200,
@@ -82,28 +82,28 @@ commentController.updateSingleComment = catchAsync(async (req, res, next) => {
   );
 });
 
-//delete a comment//////////////////////////
+//delete a comment//
 commentController.deleteSingleComment = catchAsync(async (req, res, next) => {
-  //// get data from requests
+  // get data from requests
   const currentUserId = req.userId;
   const commentId = req.params.id;
 
-  //// process
+  // process
   const comment = await Comment.findOneAndDelete({
     _id: commentId,
     author: currentUserId,
   });
 
-  //// business logic validation
+  // business logic validation
   if (!comment)
     throw new AppError(
       400,
       "Comment not found or user not authorized",
-      "delete comment error"
+      "Delete comment error"
     );
   await calculateCommentCount(comment.post);
 
-  //// response result
+  // response result
   return sendResponse(
     res,
     200,
@@ -116,18 +116,18 @@ commentController.deleteSingleComment = catchAsync(async (req, res, next) => {
 
 //get details of a comment
 commentController.getSingleComment = catchAsync(async (req, res, next) => {
-  /// get data from requests
+  // get data from requests
   const currentUserId = req.userId;
   const commentId = req.params.id;
 
-  //// process
+  // process
   let comment = await Comment.findById(commentId);
 
-  //// business logic validation
+  // business logic validation
   if (!comment)
-    throw new AppError(400, "Comment not found", "get single comment error");
+    throw new AppError(400, "Comment not found", "Get single comment error");
 
-  //// response result
+  // response result
   return sendResponse(
     res,
     200,

@@ -24,6 +24,7 @@ userController.register = catchAsync(async (req, res, next) => {
   password = await bcrypt.hash(password, salt);
 
   user = await User.create({ name, email, password }); // create a new account
+  // const accessToken = await user.generateToken()
 
   //// response result, success or not
   sendResponse(res, 200, true, { user }, null, "Create user successfully");
@@ -36,11 +37,12 @@ userController.register = catchAsync(async (req, res, next) => {
 
 // get users with pagination and filter////////////////////////
 userController.getUsers = catchAsync(async (req, res, next) => {
+  //// get data from requests - nhan yeu cau
   // return res.send(req.userId);
   const currentUserId = req.userId;
-
   let { page, limit, ...filter } = { ...req.query };
 
+  //// business logic validation - kiem chung database
   page = parseInt(page) || 1; //page number
   limit = parseInt(limit) || 10; //users per page
 
@@ -55,31 +57,32 @@ userController.getUsers = catchAsync(async (req, res, next) => {
     ? { $and: filterConditions }
     : {};
 
+  //// process - xu ly
   const count = await User.countDocuments(filterCriteria); // dem so luong trong data
   const totalPages = Math.ceil(count / limit);
-  const offset = limit * (page - 1);
+  const offset = limit * (page - 1); // phan le~
 
   let users = await User.find(filterCriteria)
     .sort({ createdAt: -1 })
     .skip(offset)
     .limit(limit);
-
   console.log(users);
 
   // // list of users !!!!!!!!!!!!!!!!!!!!!!!!
-  // const promises = users.map(async (user) => {
-  //   let temp = user.toJSON();
-  //   temp.friendship = await Friend.findOne({
-  // // friend status ???
-  //     $or: [
-  //       { from: currentUserId, to: user._id },
-  //       { from: user._id, to: currentUserId },
-  //     ],
-  //   });
-  //   return temp;
-  // });
-  // const usersWithFriendship = await Promise.all(promises);
+  const promises = users.map(async (user) => {
+    let temp = user.toJSON();
+    temp.friendship = await Friend.findOne({
+      // friend status ???
+      $or: [
+        { from: currentUserId, to: user._id },
+        { from: user._id, to: currentUserId },
+      ],
+    });
+    return temp;
+  });
+  const usersWithFriendship = await Promise.all(promises);
 
+  //// response result, success or not
   return sendResponse(
     res,
     200,
@@ -110,7 +113,7 @@ userController.getCurrentUser = catchAsync(async (req, res, next) => {
     true, // success
     user, // data
     null, // error
-    "Get current user successful" // message
+    "Get current user successfully" // message
   );
 });
 
@@ -125,6 +128,7 @@ userController.getSingleUser = catchAsync(async (req, res, next) => {
   if (!user)
     throw new AppError(400, "User is not found", "Get single user error");
 
+  //// process -xu ly
   // relationship of users, for UI friend status
   user = user.toJSON();
   user.friendship = await Friend.findOne({
@@ -133,8 +137,6 @@ userController.getSingleUser = catchAsync(async (req, res, next) => {
       { from: user._id, to: currentUserId },
     ],
   });
-
-  //// process -xu ly
 
   //// response result, success or not
   return sendResponse(
@@ -166,7 +168,6 @@ userController.updateProfile = catchAsync(async (req, res, next) => {
   const allows = [
     "name",
     "avatarUrl",
-    "coverUrl",
     "aboutMe",
     "city",
     "country",
@@ -176,6 +177,7 @@ userController.updateProfile = catchAsync(async (req, res, next) => {
     "instagramLink",
     "linkedinLink",
     "twitterLink",
+    "youtubeLink",
   ];
 
   allows.forEach((field) => {

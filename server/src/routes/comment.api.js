@@ -15,8 +15,8 @@ router.post(
   "/",
   authentication.loginRequired,
   validators.validate([
-    body("content", "missing content").exists().notEmpty(),
-    body("postId", "missing postId")
+    body("content", "Missing content").exists().notEmpty(),
+    body("postId", "Missing postId")
       .exists()
       .isString()
       .custom(validators.checkObjectId),
@@ -32,7 +32,7 @@ router.put(
   authentication.loginRequired,
   validators.validate([
     param("id").exists().isString().custom(validators.checkObjectId),
-    body("content", "missing content").exists().notEmpty(),
+    body("content", "Missing content").exists().notEmpty(),
   ]),
   commentController.updateSingleComment
 );

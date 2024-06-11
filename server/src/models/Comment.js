@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 // const { response } = require("../app");
 const Schema = mongoose.Schema;
 
+//
 const commentSchema = Schema(
   {
     content: { type: String, required: true },
