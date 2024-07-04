@@ -51,7 +51,7 @@ router.put(
   authentication.loginRequired,
   validators.validate([
     param("userId").exists().isString().custom(validators.checkObjectId),
-    body("status").exists().isString().isIn(["accept", "declined"]),
+    body("status").exists().isString().isIn(["accepted", "declined"]),
   ]),
   friendController.reactFriendRequest
 );

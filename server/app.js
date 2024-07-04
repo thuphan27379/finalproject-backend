@@ -9,16 +9,17 @@ const mongoose = require("mongoose");
 const { sendResponse, AppError } = require("./src/helpers/utils");
 const indexRouter = require("./src/routes/index");
 
-//
+//server
 const app = express();
 console.log(process.env.PORT);
+
 app.listen(process.env.PORT);
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(cors()); //
-app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static(path.join(__dirname, "public"))); // static folder
 
 // API connect
 app.use("/api", indexRouter); //

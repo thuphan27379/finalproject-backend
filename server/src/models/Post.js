@@ -15,6 +15,7 @@ const postSchema = Schema(
       like: { type: Number, default: 0 },
       dislike: { type: Number, default: 0 },
     },
+    // groupId: { type: Schema.Types.ObjectId, ref: "Group" }, // post by groupId
   },
   { timestamps: true }
 );

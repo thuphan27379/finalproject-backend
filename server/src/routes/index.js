@@ -45,7 +45,7 @@ router.use("/reactions", reactionApi);
 const groupApi = require("./group.api");
 router.use("/group", groupApi);
 
-// ?!?!?! // error handlers
+// // error handlers
 router.get("/template/:test", async (req, res, next) => {
   const { test } = req.params;
 

@@ -15,8 +15,18 @@ router.get(
   validators.validate([
     param("userId").exists().isString().custom(validators.checkObjectId),
   ]),
-  postController.getPosts
+  postController.getAllPostsBySelectedUser
 );
+
+// @route GET/posts/
+// @description get all posts for wall
+// @access login required
+router.get("/", postController.getAllPosts);
+
+// @route GET/posts/
+// @description get all posts for User Profile Page
+// @access login required
+// router.get("/user/:userId", postController.getAllPostsBySelectedUser);
 
 // @route POST/posts
 // @description create a new post

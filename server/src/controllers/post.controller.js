@@ -228,5 +228,74 @@ postController.getCommentsOfPost = catchAsync(async (req, res, next) => {
   );
 });
 
+// get all posts
+postController.getAllPosts = catchAsync(async (req, res, next) => {
+  // get data from requests - nhan yeu cau
+  let { page, limit } = { ...req.query };
+
+  // business logic validation - kiem chung database
+
+  // process - xu ly
+  page = parseInt(page) || 1; //page
+  limit = parseInt(limit) || 10;
+
+  // for finding posts
+  const filterConditions = [{ isDeleted: false }];
+  const filterCriteria = filterConditions.length
+    ? { $and: filterConditions }
+    : {};
+
+  // for pagination
+  const count = await Post.countDocuments(filterCriteria);
+  const totalPages = Math.ceil(count / limit);
+  const offset = limit * (page - 1);
+
+  // return posts and page
+  let posts = await Post.find(filterCriteria)
+    .sort({ createdAt: -1 })
+    .skip(offset)
+    .limit(limit)
+    .populate("author");
+
+  // response result, success or not
+  return sendResponse(res, 200, true, { posts, totalPages, count }, null, "");
+});
+
+// get all posts by selectedUser
+postController.getAllPostsBySelectedUser = catchAsync(
+  async (req, res, next) => {
+    // get data from requests - nhan yeu cau
+    let { page, limit } = { ...req.query };
+    const selectedUserId = req.params.userId;
+    console.log("select", selectedUserId);
+    // business logic validation - kiem chung database
+
+    // process - xu ly
+    page = parseInt(page) || 1; //page
+    limit = parseInt(limit) || 10;
+
+    // for finding posts
+    const filterConditions = [{ author: selectedUserId }, { isDeleted: false }];
+    const filterCriteria = filterConditions.length
+      ? { $and: filterConditions }
+      : {};
+
+    // for pagination
+    const count = await Post.countDocuments(filterCriteria);
+    const totalPages = Math.ceil(count / limit);
+    const offset = limit * (page - 1);
+
+    // return posts and page
+    let posts = await Post.find(filterCriteria)
+      .sort({ createdAt: -1 })
+      .skip(offset)
+      .limit(limit)
+      .populate("author");
+
+    // response result, success or not
+    return sendResponse(res, 200, true, { posts, totalPages, count }, null, "");
+  }
+);
+
 //
 module.exports = postController;

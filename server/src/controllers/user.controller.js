@@ -46,6 +46,7 @@ userController.getUsers = catchAsync(async (req, res, next) => {
   page = parseInt(page) || 1; //page number
   limit = parseInt(limit) || 10; //users per page
 
+  //
   const filterConditions = [{ isDeleted: false }];
   if (filter.name) {
     filterConditions.push({
@@ -172,7 +173,8 @@ userController.updateProfile = catchAsync(async (req, res, next) => {
     "city",
     "country",
     "company",
-    "jobTitle",
+    // "jobTitle",
+    "others",
     "facebookLink",
     "instagramLink",
     "linkedinLink",

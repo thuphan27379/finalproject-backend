@@ -21,6 +21,7 @@ const userSchema = Schema(
     country: { type: String, required: false, default: "" },
     company: { type: String, required: false, default: "" }, //
     jobTitle: { type: String, required: false, default: "" }, //
+    others: { type: String, required: false, default: "" }, //
     // & document about product/service
 
     facebookLink: { type: String, required: false, default: "" },

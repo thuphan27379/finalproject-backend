@@ -35,12 +35,22 @@ router.post(
   "/",
   authentication.loginRequired,
   validators.validate([
-    body("name", "description", "categories", "interests")
-      .exists()
-      .notEmpty()
-      .isString(),
+    body("name", "description", "interests").exists().notEmpty().isString(),
   ]),
   groupController.createNewGroup
+);
+
+// @route GET/group
+// @description get list of group & interest & search
+// @body (userId, groupId, name, categories, interests)
+// @access login required
+router.get(
+  "/groupList",
+  authentication.loginRequired,
+  // validators.validate([
+  //   param("groupId").exists().isString().custom(validators.checkObjectId),
+  // ]),
+  groupController.getListOfGroups
 );
 
 // @route PUT/group ???/members
@@ -62,7 +72,7 @@ router.put(
 // @body (userId, groupId)
 // @access login required
 router.delete(
-  "/",
+  "/:groupId/:userId",
   authentication.loginRequired,
   validators.validate([
     param("userId").exists().isString().custom(validators.checkObjectId),
@@ -85,32 +95,14 @@ router.get(
   groupController.getListOfMembers
 );
 
-// @route GET/group
-// @description get list of group & search by name, or categories or interests (groupList)
-// @body (userId, groupId, name, categories, interests)
-// @access login required
-router.get(
-  "/",
-  authentication.loginRequired,
-  validators.validate([
-    param("userId").exists().isString().custom(validators.checkObjectId),
-    param("groupId").exists().isString().custom(validators.checkObjectId),
-
-    body("name", "categories", "interests").exists().notEmpty().isString(),
-    // memberCount, postCount, createdAt
-  ]),
-  groupController.getListOfGroups
-);
-
 // @route POST/group/posts
 // @description create a new post in the group (postForm)
 // @body (userId, groupId, content)
 // @access login required
 router.post(
-  "/posts",
+  "/:groupId/posts",
   authentication.loginRequired,
   validators.validate([
-    param("userId").exists().isString().custom(validators.checkObjectId),
     param("groupId").exists().isString().custom(validators.checkObjectId),
 
     body("content", "missing content").exists().notEmpty(),
