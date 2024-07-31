@@ -13,9 +13,13 @@ router.get("/", function (req, res, next) {
   res.send({ status: "ok", data: "hello" }); //
 });
 
+// /aboutus
+// /startup
+// /project
+// /domain
 // homeApi // company
-// const homeApi = require("./home.api");
-// router.use("/", homeApi);
+const homeApi = require("./home.api");
+router.use("/home", homeApi);
 
 // authApi
 const authApi = require("./auth.api");
@@ -41,11 +45,11 @@ router.use("/friends", friendApi);
 const reactionApi = require("./reaction.api");
 router.use("/reactions", reactionApi);
 
-// groupApi
+// groupApi /blog/group ???
 const groupApi = require("./group.api");
 router.use("/group", groupApi);
 
-// // error handlers
+// error handlers
 router.get("/template/:test", async (req, res, next) => {
   const { test } = req.params;
 

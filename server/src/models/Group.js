@@ -14,28 +14,13 @@ const groupSchema = Schema(
     interests: [{ type: String, required: true }], //
 
     members: [{ type: Schema.Types.ObjectId, ref: "User" }], // (users ID list)
-    postsByGroupId: [{ type: Schema.Types.ObjectId, ref: "Post" }], // (post by groupId)? ref: "Group"
-    postGroupCount: { type: Number, default: 0 },
+    // list posts by group
+    postsByGroupId: [{ type: Schema.Types.ObjectId, ref: "Post" }], // (postId by groupId)
+    // postGroupCount: { type: Number, default: 0 },
     isDeleted: { type: Boolean, default: false, select: false },
   },
   { timestamps: true }
 );
-
-// hide password in admin
-// userSchema.methods.toJSON = function () {
-//   const user = this._doc;
-//   delete user.password;
-//   delete user.isDeleted;
-//   return user;
-// };
-
-// authentication
-// userSchema.methods.generateToken = async function () {
-//   const accessToken = await jwt.sign({ _id: this._id }, JWT_SECRET_KEY, {
-//     expiresIn: "1d",
-//   });
-//   return accessToken;
-// };
 
 const Group = mongoose.model("Group", groupSchema);
 module.exports = Group;

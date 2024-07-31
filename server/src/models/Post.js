@@ -15,7 +15,12 @@ const postSchema = Schema(
       like: { type: Number, default: 0 },
       dislike: { type: Number, default: 0 },
     },
-    // groupId: { type: Schema.Types.ObjectId, ref: "Group" }, // post by groupId
+    // list post not from group
+    fromGroup: { type: Boolean }, // post by group //false OR true
+    // get post group true
+    // get post bthuong false
+    // khi tao post trong group, fromGroup: true x
+    // khi tao post bthuong, false x
   },
   { timestamps: true }
 );

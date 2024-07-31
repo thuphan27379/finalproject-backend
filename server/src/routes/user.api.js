@@ -2,11 +2,11 @@ const express = require("express");
 const router = express.Router();
 const { body, param } = require("express-validator");
 
-const userController = require("../controllers/user.controller"); //?!
+const userController = require("../controllers/user.controller"); // ?!
 const validators = require("../midlewares/validators");
 const authentication = require("../midlewares/authentication");
 
-// ?!?!?!?!?!
+//
 // const {
 //   register,
 //   getUsers,

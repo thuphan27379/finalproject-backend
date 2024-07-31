@@ -331,7 +331,7 @@ friendController.cancelFriendRequest = catchAsync(async (req, res, next) => {
     to: toUserId,
     status: "pending",
   });
-  console.log("friend id", friend);
+  // console.log("friend id", friend);
 
   // process logic
   if (!friend)

@@ -36,7 +36,7 @@ router.post(
   "/",
   authentication.loginRequired,
   validators.validate([body("content", "missing content").exists().notEmpty()]),
-  postController.createNewPost
+  postController.createPost // createPost ??
 );
 
 // @route PUT/posts/:id

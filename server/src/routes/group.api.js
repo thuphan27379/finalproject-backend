@@ -14,8 +14,6 @@ const reactionController = require("../controllers/reaction.controller");
 const groupController = require("../controllers/group.controller");
 const { post } = require("./user.api");
 
-// how to member required?!?! check group.member co userId
-
 //create /POST
 //get /GET
 //update /PUT
@@ -47,9 +45,6 @@ router.post(
 router.get(
   "/groupList",
   authentication.loginRequired,
-  // validators.validate([
-  //   param("groupId").exists().isString().custom(validators.checkObjectId),
-  // ]),
   groupController.getListOfGroups
 );
 
@@ -67,18 +62,30 @@ router.put(
   groupController.joinGroup
 );
 
-// @route DELETE/group ???/members
+// @route DELETE/group ???/members Or PUT ?
 // @description leave a group (delete user in members list)
 // @body (userId, groupId)
 // @access login required
 router.delete(
-  "/:groupId/:userId",
+  "/:groupId",
   authentication.loginRequired,
   validators.validate([
-    param("userId").exists().isString().custom(validators.checkObjectId),
     param("groupId").exists().isString().custom(validators.checkObjectId),
   ]),
   groupController.leaveGroup
+);
+
+// @route GET/group
+// @description get single group
+// @body (groupId)
+// @access login required
+router.get(
+  "/:groupId",
+  authentication.loginRequired,
+  validators.validate([
+    param("groupId").exists().isString().custom(validators.checkObjectId),
+  ]),
+  groupController.getSingleGroup
 );
 
 // @route GET/group/members ???params groupId
@@ -104,7 +111,6 @@ router.post(
   authentication.loginRequired,
   validators.validate([
     param("groupId").exists().isString().custom(validators.checkObjectId),
-
     body("content", "missing content").exists().notEmpty(),
   ]),
   groupController.createNewGroupPost
@@ -115,12 +121,10 @@ router.post(
 // @body (userId, groupId, postId)
 // @access login required
 router.get(
-  "/posts/",
+  "/:groupId/posts",
   authentication.loginRequired,
   validators.validate([
-    param("userId").exists().isString().custom(validators.checkObjectId),
     param("groupId").exists().isString().custom(validators.checkObjectId),
-    // param("postId").exists().isString().custom(validators.checkObjectId),
   ]),
   groupController.getListOfPosts
 );
@@ -136,7 +140,6 @@ router.post(
     param("userId").exists().isString().custom(validators.checkObjectId),
     param("groupId").exists().isString().custom(validators.checkObjectId),
     param("postId").exists().isString().custom(validators.checkObjectId),
-
     body("content", "missing content").exists().notEmpty(),
   ]),
   groupController.createNewGroupComment
@@ -152,9 +155,6 @@ router.post(
   validators.validate([
     param("userId").exists().isString().custom(validators.checkObjectId),
     param("groupId").exists().isString().custom(validators.checkObjectId),
-    // param("postId").exists().isString().custom(validators.checkObjectId),
-    // param("commentId").exists().isString().custom(validators.checkObjectId),
-
     body("targetType", "invalid targetType").exists().isIn(["Post", "Comment"]),
     body("targetId", "invalid targetId")
       .exists()
@@ -163,16 +163,5 @@ router.post(
   ]),
   groupController.createNewGroupReactions
 );
-
-// @route /group/
-// @description (commentList)
-// @body ()
-// @access login required
-// router.post(
-//   "/group/",
-//   authentication.loginRequired,
-//   validators.validate([]),
-//   groupController.
-// );
 
 module.exports = router;

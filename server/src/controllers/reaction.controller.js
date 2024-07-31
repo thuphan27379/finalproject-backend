@@ -43,24 +43,24 @@ const calculateReactions = async (targetId, targetType) => {
 
 //
 reactionController.saveReaction = catchAsync(async (req, res, next) => {
-  //// get data from requests:
+  // get data from requests:
   const currentUserId = req.userId;
   const { targetType, targetId, emoji } = req.body;
 
-  //// process:
-  //// check targetType exists
+  // process:
+  // check targetType exists
   const targetObj = await mongoose.model(targetType).findById(targetId); // tra ve la Post hoac Comment
   if (!targetObj)
     throw new AppError(400, `${targetType} not found`, "Create reaction error");
 
-  //// find the reaction if exists
+  // find the reaction if exists
   let reaction = await Reaction.findOne({
     targetType,
     targetId,
     author: currentUserId,
   });
 
-  //// if there is no reaction in the DB => create a new one
+  // if there is no reaction in the DB => create a new one
   if (!reaction) {
     reaction = await Reaction.create({
       targetType,
@@ -69,22 +69,22 @@ reactionController.saveReaction = catchAsync(async (req, res, next) => {
       emoji,
     });
   } else {
-    //// if there is a previous reaction in the DB => compare the emojis
+    // if there is a previous reaction in the DB => compare the emojis
     if (reaction.emoji === emoji) {
-      //// if they are same => delete the reaction
+      // if they are same => delete the reaction
       await reaction.deleteOne();
       // console.log(reaction);
     } else {
-      //// if they are different => update the reaction
+      // if they are different => update the reaction
       reaction.emoji = emoji;
       await reaction.save();
     }
   }
 
   const reactions = await calculateReactions(targetId, targetType);
-  console.log(reactions);
+  // console.log(reactions);
 
-  //// response result:
+  // response result:
   return sendResponse(
     res,
     200,

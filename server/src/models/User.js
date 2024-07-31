@@ -9,7 +9,7 @@ const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY; //.env
 //
 const userSchema = Schema(
   {
-    name: { type: String, required: true }, //true
+    name: { type: String, required: true }, //username OR company name for show account name
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true, select: false },
 
@@ -19,11 +19,12 @@ const userSchema = Schema(
     aboutMe: { type: String, required: false, default: "" }, // short description
     city: { type: String, required: false, default: "" },
     country: { type: String, required: false, default: "" },
-    company: { type: String, required: false, default: "" }, //
-    jobTitle: { type: String, required: false, default: "" }, //
-    others: { type: String, required: false, default: "" }, //
+    company: { type: String, required: false, default: "" }, // company name
+    jobTitle: { type: String, required: false, default: "" }, // linh vuc kinh doanh
+    others: { type: String, required: false, default: "" }, // san pham & dich vu
     // & document about product/service
 
+    website: { type: String, required: false, default: "" }, //
     facebookLink: { type: String, required: false, default: "" },
     instagramLink: { type: String, required: false, default: "" },
     linkedinLink: { type: String, required: false, default: "" },

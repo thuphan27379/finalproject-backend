@@ -7,26 +7,26 @@ const { use } = require("../routes/user.api");
 //
 const userController = {};
 
-// register new user/create a new account//////////////////////
+// register new user/create a new account
 // catchAsync \helpers\utils.js
 userController.register = catchAsync(async (req, res, next) => {
   // try {
-  //// get data from requests - nhan yeu cau
+  // get data from requests - nhan yeu cau
   let { name, email, password } = req.body;
 
-  //// business logic validation - kiem chung database
+  // business logic validation - kiem chung database
   let user = await User.findOne({ email });
   if (user)
     throw new AppError(400, "User already exists", "Registration error");
 
-  //// process - xu ly
+  // process - xu ly
   const salt = await bcrypt.genSalt(10); // ma hoa password
   password = await bcrypt.hash(password, salt);
 
   user = await User.create({ name, email, password }); // create a new account
   // const accessToken = await user.generateToken()
 
-  //// response result, success or not
+  // response result, success or not
   sendResponse(res, 200, true, { user }, null, "Create user successfully");
   // } catch (error) {
   //   next(error);
@@ -35,14 +35,14 @@ userController.register = catchAsync(async (req, res, next) => {
   // res.send("user registration");
 });
 
-// get users with pagination and filter////////////////////////
+// get users with pagination and filter
 userController.getUsers = catchAsync(async (req, res, next) => {
-  //// get data from requests - nhan yeu cau
+  // get data from requests - nhan yeu cau
   // return res.send(req.userId);
   const currentUserId = req.userId;
   let { page, limit, ...filter } = { ...req.query };
 
-  //// business logic validation - kiem chung database
+  // business logic validation - kiem chung database
   page = parseInt(page) || 1; //page number
   limit = parseInt(limit) || 10; //users per page
 
@@ -58,7 +58,7 @@ userController.getUsers = catchAsync(async (req, res, next) => {
     ? { $and: filterConditions }
     : {};
 
-  //// process - xu ly
+  // process - xu ly
   const count = await User.countDocuments(filterCriteria); // dem so luong trong data
   const totalPages = Math.ceil(count / limit);
   const offset = limit * (page - 1); // phan le~
@@ -67,9 +67,9 @@ userController.getUsers = catchAsync(async (req, res, next) => {
     .sort({ createdAt: -1 })
     .skip(offset)
     .limit(limit);
-  console.log(users);
+  // console.log(users);
 
-  // // list of users !!!!!!!!!!!!!!!!!!!!!!!!
+  //  list of users
   const promises = users.map(async (user) => {
     let temp = user.toJSON();
     temp.friendship = await Friend.findOne({
@@ -83,7 +83,7 @@ userController.getUsers = catchAsync(async (req, res, next) => {
   });
   const usersWithFriendship = await Promise.all(promises);
 
-  //// response result, success or not
+  // response result, success or not
   return sendResponse(
     res,
     200,
@@ -94,20 +94,20 @@ userController.getUsers = catchAsync(async (req, res, next) => {
   );
 });
 
-// get current user info///////////////////////////////
+// get current user info
 userController.getCurrentUser = catchAsync(async (req, res, next) => {
-  //// get data from requests - nhan yeu cau
+  // get data from requests - nhan yeu cau
   const currentUserId = req.userId;
 
-  //// business logic validation - kiem chung database
+  // business logic validation - kiem chung database
   const user = await User.findById(currentUserId);
   if (!user) {
     throw new AppError(400, "User is not found", "Get current user error");
   }
 
-  //// process -xu ly
+  // process -xu ly
 
-  //// response result, success or not
+  // response result, success or not
   return sendResponse(
     res, // res
     200, // status
@@ -118,18 +118,18 @@ userController.getCurrentUser = catchAsync(async (req, res, next) => {
   );
 });
 
-// get user profile////////////////////////////
+// get user profile
 userController.getSingleUser = catchAsync(async (req, res, next) => {
-  //// get data from requests - nhan yeu cau
+  // get data from requests - nhan yeu cau
   const currentUserId = req.userId;
   const userId = req.params.id;
 
-  //// business logic validation - kiem chung database
+  // business logic validation - kiem chung database
   let user = await User.findById(userId);
   if (!user)
     throw new AppError(400, "User is not found", "Get single user error");
 
-  //// process -xu ly
+  // process -xu ly
   // relationship of users, for UI friend status
   user = user.toJSON();
   user.friendship = await Friend.findOne({
@@ -139,7 +139,7 @@ userController.getSingleUser = catchAsync(async (req, res, next) => {
     ],
   });
 
-  //// response result, success or not
+  // response result, success or not
   return sendResponse(
     res, // res
     200, // status
@@ -150,13 +150,13 @@ userController.getSingleUser = catchAsync(async (req, res, next) => {
   );
 });
 
-// update user profile////////////////////////////
+// update user profile
 userController.updateProfile = catchAsync(async (req, res, next) => {
-  //// get data from requests - nhan yeu cau
+  // get data from requests - nhan yeu cau
   const currentUserId = req.userId;
   const userId = req.params.id;
 
-  //// business logic validation - kiem chung database
+  // business logic validation - kiem chung database
   if (currentUserId !== userId)
     throw new AppError(400, "Permission required", "Update user error");
 
@@ -165,7 +165,7 @@ userController.updateProfile = catchAsync(async (req, res, next) => {
     throw new AppError(400, "User is not found", "Update user error");
   }
 
-  //// process -xu ly
+  // process -xu ly
   const allows = [
     "name",
     "avatarUrl",
@@ -189,7 +189,7 @@ userController.updateProfile = catchAsync(async (req, res, next) => {
   });
   await user.save();
 
-  //// response result, success or not
+  // response result, success or not
   return sendResponse(
     res, // res
     200, // status
