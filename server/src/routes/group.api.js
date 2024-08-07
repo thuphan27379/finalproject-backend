@@ -14,16 +14,6 @@ const reactionController = require("../controllers/reaction.controller");
 const groupController = require("../controllers/group.controller");
 const { post } = require("./user.api");
 
-//create /POST
-//get /GET
-//update /PUT
-//delete /DELETE
-
-// group/ - groupId
-// group/members - userId
-// group/posts - postId
-// group/comments - commentId
-
 // @route POST/group
 // @description create a new group (groupForm)
 // @body (userId, name, description, categories, interests..)
@@ -117,7 +107,7 @@ router.post(
 );
 
 // @route GET/group/posts
-// @description get list of posts (postList)
+// @description get list of posts in group(postList)
 // @body (userId, groupId, postId)
 // @access login required
 router.get(
@@ -127,41 +117,6 @@ router.get(
     param("groupId").exists().isString().custom(validators.checkObjectId),
   ]),
   groupController.getListOfPosts
-);
-
-// @route POST/group/comments
-// @description comment on the post in the group (commentForm)
-// @body (userId, groupId, postId )
-// @access login required
-router.post(
-  "/comments",
-  authentication.loginRequired,
-  validators.validate([
-    param("userId").exists().isString().custom(validators.checkObjectId),
-    param("groupId").exists().isString().custom(validators.checkObjectId),
-    param("postId").exists().isString().custom(validators.checkObjectId),
-    body("content", "missing content").exists().notEmpty(),
-  ]),
-  groupController.createNewGroupComment
-);
-
-// @route POST/group/reactions
-// @description reaction on the post and comment in the group
-// @body {userId, groupId, postId, commentId, targetType: 'post' or 'comment', targetId, emoji: 'like' or 'dislike'}
-// @access login required
-router.post(
-  "/reactions",
-  authentication.loginRequired,
-  validators.validate([
-    param("userId").exists().isString().custom(validators.checkObjectId),
-    param("groupId").exists().isString().custom(validators.checkObjectId),
-    body("targetType", "invalid targetType").exists().isIn(["Post", "Comment"]),
-    body("targetId", "invalid targetId")
-      .exists()
-      .custom(validators.checkObjectId),
-    body("emoji", "invalid emoji").exists().isIn(["Like", "Dislike"]),
-  ]),
-  groupController.createNewGroupReactions
 );
 
 module.exports = router;

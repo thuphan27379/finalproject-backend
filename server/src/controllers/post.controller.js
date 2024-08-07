@@ -16,12 +16,11 @@ const calculatePostCount = async (userId) => {
   await User.findByIdAndUpdate(userId, { postCount });
 };
 
-// create a new post// postController.createPost ??
-// & on the group ?!?!
+// create a new post// postController.createPost
 postController.createPost = catchAsync(async (req, res, next) => {
   // get data from requests - nhan yeu cau
   const currentUserId = req.userId;
-  const currentGroupId = req.params.groupId; //?
+  const currentGroupId = req.params.groupId;
   const { content, image, fromGroup, groupId } = req.body;
 
   // business logic validation - kiem chung database
@@ -30,7 +29,7 @@ postController.createPost = catchAsync(async (req, res, next) => {
     content,
     image,
     author: currentUserId,
-    // fromGroup: fromGroup || false, // Default to false if not provided
+    // fromGroup: false
     fromGroup: !!fromGroup, // Convert to boolean if necessary
     groupId: fromGroup ? groupId : null, // Only set groupId if fromGroup is true
   });
@@ -51,7 +50,7 @@ postController.createPost = catchAsync(async (req, res, next) => {
   );
 });
 
-// update a single post//
+// update a single post
 postController.updateSinglePost = catchAsync(async (req, res, next) => {
   // get data from requests - nhan yeu cau
   const currentUserId = req.userId;
@@ -83,7 +82,7 @@ postController.updateSinglePost = catchAsync(async (req, res, next) => {
   );
 });
 
-// get a single post//
+// get a single post
 postController.getSinglePost = catchAsync(async (req, res, next) => {
   // get data from requests - nhan yeu cau
   const currentUserId = req.userId;
@@ -109,16 +108,16 @@ postController.getSinglePost = catchAsync(async (req, res, next) => {
   );
 });
 
-// get all posts and user can see with pagination //
+// get all posts and user can see with pagination
 postController.getPosts = catchAsync(async (req, res, next) => {
   // get data from requests - nhan yeu cau
   // return res.send(req.userId);
   const currentUserId = req.userId;
-  const userId = req.params.userId; //get userId of request
+  const userId = req.params.userId; // get userId of request
   let { page, limit } = { ...req.query };
 
   // business logic validation - kiem chung database
-  let user = await User.findById(userId); //check userId in database exist or not
+  let user = await User.findById(userId); // check userId in database exist or not
   if (!user) throw new AppError(400, "user is not found", "get posts error");
 
   // post from group,  Retrieve user's group memberships
@@ -130,7 +129,7 @@ postController.getPosts = catchAsync(async (req, res, next) => {
   const groupIds = userGroups.map((group) => group._id);
 
   // process - xu ly
-  page = parseInt(page) || 1; //page
+  page = parseInt(page) || 1; // page
   limit = parseInt(limit) || 10;
 
   // for find friends's ID to get friend's posts
@@ -155,7 +154,7 @@ postController.getPosts = catchAsync(async (req, res, next) => {
   const filterConditions = [
     {
       isDeleted: false,
-      fromGroup: false, // not post from group
+      fromGroup: false, // not post from group //
     },
     { author: { $in: userFriendIDs } },
   ];
@@ -167,12 +166,6 @@ postController.getPosts = catchAsync(async (req, res, next) => {
   const count = await Post.countDocuments(filterCriteria);
   const totalPages = Math.ceil(count / limit);
   const offset = limit * (page - 1);
-
-  // if post from group & by groupId (postsByGroupId)
-  // const posts = await Post.find({
-  //   fromGroup: true,
-  //   group: { $in: groupIds },
-  // });
 
   // return posts and page
   let posts = await Post.find(filterCriteria)
@@ -196,15 +189,8 @@ postController.deleteSinglePost = catchAsync(async (req, res, next) => {
   const post = await Post.findByIdAndUpdate(
     { _id: postId, author: currentUserId },
     { isDeleted: true }, // update isDeleted
-    { new: true } //sau do tra lai 1 object moi
+    { new: true } // sau do tra lai 1 object moi
   );
-
-  // // also remove postId trong postsByGroupId[] of Group
-  // const updatePostByGroup = await Group.findByIdAndUpdate(
-  //   postId, groupId,
-  //   { $pull: { "groups.$._id": postId } },
-  //   { new: true }
-  // );
 
   if (!post)
     throw new AppError(
@@ -233,11 +219,7 @@ postController.getCommentsOfPost = catchAsync(async (req, res, next) => {
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 10;
 
-  // business logic validation
-  // if (!post)
-  //   throw new AppError(404, "Comments not found", "get comments of post error");
-
-  //// process
+  // process
   const count = await Comment.countDocuments({ post: postId });
   const totalPages = Math.ceil(count / limit);
   const offset = limit * (page - 1);
@@ -247,6 +229,7 @@ postController.getCommentsOfPost = catchAsync(async (req, res, next) => {
     .skip(offset)
     .limit(limit)
     .populate("author");
+
   // response result
   return sendResponse(
     res,
@@ -285,13 +268,10 @@ postController.getAllPosts = catchAsync(async (req, res, next) => {
   const totalPages = Math.ceil(count / limit);
   const offset = limit * (page - 1);
 
-  //     fromGroup: false,
-
   // return posts and page
   let posts = await Post.find(filterCriteria)
     .sort({
       createdAt: -1,
-      // fromGroup: false, // not post from group
     })
     .skip(offset)
     .limit(limit)
@@ -308,10 +288,11 @@ postController.getAllPostsBySelectedUser = catchAsync(
     let { page, limit } = { ...req.query };
     const selectedUserId = req.params.userId;
     // console.log("select", selectedUserId);
+
     // business logic validation - kiem chung database
 
     // process - xu ly
-    page = parseInt(page) || 1; //page
+    page = parseInt(page) || 1; // page
     limit = parseInt(limit) || 10;
 
     // for finding posts

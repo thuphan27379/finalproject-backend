@@ -1,10 +1,9 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
-const jwt = require("jsonwebtoken"); //token
+const jwt = require("jsonwebtoken"); // token
 
 //
 const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY; //.env
-// const { response } = require("../app");
 
 //
 const userSchema = Schema(
@@ -14,13 +13,10 @@ const userSchema = Schema(
     password: { type: String, required: true, select: false },
 
     avatarUrl: { type: String, required: false, default: "" },
-    coverUrl: { type: String, required: false, default: "" }, // thay the la company image/video
-
     aboutMe: { type: String, required: false, default: "" }, // short description
     city: { type: String, required: false, default: "" },
     country: { type: String, required: false, default: "" },
     company: { type: String, required: false, default: "" }, // company name
-    jobTitle: { type: String, required: false, default: "" }, // linh vuc kinh doanh
     others: { type: String, required: false, default: "" }, // san pham & dich vu
     // & document about product/service
 
@@ -35,6 +31,8 @@ const userSchema = Schema(
     friendCount: { type: Number, default: 0 },
     postCount: { type: Number, default: 0 },
     friendship: { type: Schema.ObjectId, ref: "Friend" }, // relationship
+
+    // roll: {["normal", "admin"]}
   },
   { timestamps: true }
 );

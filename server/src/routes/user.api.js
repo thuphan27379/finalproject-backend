@@ -6,15 +6,6 @@ const userController = require("../controllers/user.controller"); // ?!
 const validators = require("../midlewares/validators");
 const authentication = require("../midlewares/authentication");
 
-//
-// const {
-//   register,
-//   getUsers,
-//   getCurrentUser,
-//   getSingleUser,
-//   updateProfile,
-// } = require("../controllers/user.controller");
-
 // @route POST/users
 // @description register new user
 // @body (name, email, password)
@@ -58,7 +49,7 @@ router.get(
 
 // @route PUT/users/:id/
 // @description update user profile
-// @body (name, avatarURL, coverURL, aboutMe, city, country, company, jobtitle, social links)
+// @body (name, avatarURL, aboutMe, city, country, company, jobtitle, social links)
 // @access log in required
 router.put(
   "/:id",

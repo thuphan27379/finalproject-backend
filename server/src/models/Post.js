@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-// const { response } = require("../app");
 const Schema = mongoose.Schema;
 
 // Schema()
@@ -15,12 +14,7 @@ const postSchema = Schema(
       like: { type: Number, default: 0 },
       dislike: { type: Number, default: 0 },
     },
-    // list post not from group
-    fromGroup: { type: Boolean }, // post by group //false OR true
-    // get post group true
-    // get post bthuong false
-    // khi tao post trong group, fromGroup: true x
-    // khi tao post bthuong, false x
+    fromGroup: { type: Boolean }, //
   },
   { timestamps: true }
 );

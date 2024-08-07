@@ -9,7 +9,7 @@ const mongoose = require("mongoose");
 const { sendResponse, AppError } = require("./src/helpers/utils");
 const indexRouter = require("./src/routes/index");
 
-//server
+// server
 const app = express();
 console.log(process.env.PORT);
 

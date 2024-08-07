@@ -16,7 +16,7 @@ const groupSchema = Schema(
     members: [{ type: Schema.Types.ObjectId, ref: "User" }], // (users ID list)
     // list posts by group
     postsByGroupId: [{ type: Schema.Types.ObjectId, ref: "Post" }], // (postId by groupId)
-    // postGroupCount: { type: Number, default: 0 },
+    postGroupCount: { type: Number, default: 0 },
     isDeleted: { type: Boolean, default: false, select: false },
   },
   { timestamps: true }

@@ -23,22 +23,17 @@ homeController.getDomainList = catchAsync(async (req, res, next) => {
   const domainForSale = { isSale: true };
   const query = { $and: [domainForSale, searchQuery] };
 
-  // list
-  // const domainsForSale = await Domain.countDocuments({
-  //   isSale: true, //
-  //   name: { $regex: `${q}` }, // search
-  // });
-
   // for pagination
   const count = await Domain.countDocuments(query);
   const totalPages = Math.ceil(count / limit);
   const offset = limit * (page - 1);
 
   const domainsForSale = await Domain.find(query).limit(limit).skip(offset);
-  // console.log("domain", domainForSale);
+  console.log("domain", domainForSale);
 
   const domains = domainsForSale.map((domain) => {
     return {
+      id: domain._id,
       topLevel: domain.topLevel,
       name: domain.name,
       description: domain.description,
@@ -52,7 +47,7 @@ homeController.getDomainList = catchAsync(async (req, res, next) => {
     res,
     200,
     true,
-    { domains, totalPages, currentPage },
+    { domains, totalPages, currentPage, count },
     null,
     "Get domains for sale successfully"
   );
@@ -67,7 +62,7 @@ homeController.getStartupList = catchAsync(async (req, res, next) => {
   // business logic validation
 
   // process
-  page = parseInt(page) || 1; //page
+  page = parseInt(page) || 1; // page
   limit = parseInt(limit) || 20;
 
   // search
@@ -76,20 +71,17 @@ homeController.getStartupList = catchAsync(async (req, res, next) => {
   const query = { $and: [domainForStartup, searchQuery] };
 
   // for pagination
-  const count = await Domain.countDocuments(domainForStartup);
+  const count = await Domain.countDocuments(query);
   const totalPages = Math.ceil(count / limit);
   const offset = limit * (page - 1);
 
   // list
-  const domainsForStartup = await Domain.find({
-    isStartup: true, //
-  })
-    .limit(limit)
-    .skip(offset);
+  const domainsForStartup = await Domain.find(query).limit(limit).skip(offset);
   // console.log("Startup", domainForStartup);
 
   const startups = domainsForStartup.map((startup) => {
     return {
+      id: startup._id,
       topLevel: startup.topLevel,
       name: startup.name,
       description: startup.description,
@@ -127,6 +119,7 @@ homeController.getProjectList = catchAsync(async (req, res, next) => {
 
   const projects = domainProject.map((project) => {
     return {
+      id: project._id,
       topLevel: project.topLevel,
       name: project.name,
       description: project.description,
@@ -148,51 +141,6 @@ homeController.getProjectList = catchAsync(async (req, res, next) => {
     { projects },
     null,
     "Get projects list successfully"
-  );
-});
-
-// get search domain by name, search input at HomeHeader
-homeController.getSearchDomain = catchAsync(async (req, res, next) => {
-  // get data from requests
-  let { q, page, limit } = req.query;
-  // let searchDomainName = req.query; // get search input
-  console.log(q);
-  // business logic validation
-  // bo .com, phia sau .
-
-  // process
-  page = parseInt(page) || 1; //page
-  limit = parseInt(limit) || 10;
-
-  const searchDomain = await Domain.find({
-    name: `/${q}/`,
-    // name = search input
-  });
-  // console.log("search domain", searchDomain);
-
-  const searchDomainResult = searchDomain.map((startup) => {
-    return {
-      topLevel: startup.topLevel,
-      name: startup.name,
-      description: startup.description,
-      ideas: startup.ideas,
-      price: startup.price,
-    };
-  });
-
-  // for pagination
-  const count = await Domain.countDocuments(searchDomainResult);
-  const totalPages = Math.ceil(count / limit);
-  const offset = limit * (page - 1);
-
-  // response result
-  return sendResponse(
-    res,
-    200,
-    true,
-    { searchDomainResult },
-    null,
-    "Get search domains successfully"
   );
 });
 

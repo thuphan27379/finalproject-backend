@@ -23,11 +23,6 @@ router.get(
 // @access login required
 router.get("/", postController.getAllPosts);
 
-// @route GET/posts/
-// @description get all posts for User Profile Page
-// @access login required
-// router.get("/user/:userId", postController.getAllPostsBySelectedUser);
-
 // @route POST/posts
 // @description create a new post
 // @body (content, image)
@@ -79,7 +74,7 @@ router.get(
 // @route GET/posts/:id/comments
 // @description get comments of a post
 // @access login required
-// inside the function getSinglePost of postController////
+// inside the function getSinglePost of postController
 router.get(
   "/:id/comments",
   authentication.loginRequired,

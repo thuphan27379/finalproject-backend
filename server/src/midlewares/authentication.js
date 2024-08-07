@@ -20,7 +20,7 @@ authentication.loginRequired = (req, res, next) => {
             401,
             "Token expired & Login again",
             "Authentication error"
-          ); //chuyen qua loginPage
+          ); // chuyen qua loginPage?
         } else {
           throw new AppError(
             401,

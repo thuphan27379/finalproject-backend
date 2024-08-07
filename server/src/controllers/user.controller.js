@@ -43,8 +43,8 @@ userController.getUsers = catchAsync(async (req, res, next) => {
   let { page, limit, ...filter } = { ...req.query };
 
   // business logic validation - kiem chung database
-  page = parseInt(page) || 1; //page number
-  limit = parseInt(limit) || 10; //users per page
+  page = parseInt(page) || 1; // page number
+  limit = parseInt(limit) || 10; // users per page
 
   //
   const filterConditions = [{ isDeleted: false }];
@@ -90,7 +90,7 @@ userController.getUsers = catchAsync(async (req, res, next) => {
     true,
     { users: users, totalPages, count },
     null,
-    ""
+    "Get Users successfully"
   );
 });
 
@@ -173,7 +173,6 @@ userController.updateProfile = catchAsync(async (req, res, next) => {
     "city",
     "country",
     "company",
-    // "jobTitle",
     "others",
     "facebookLink",
     "instagramLink",

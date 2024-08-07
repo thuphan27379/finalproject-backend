@@ -14,7 +14,7 @@ const calculatorFriendCount = async (userId) => {
   await User.findByIdAndUpdate(userId, { friendCount: friendCount });
 };
 
-// send a friend request//
+// send a friend request
 friendController.sendFriendRequest = catchAsync(async (req, res, next) => {
   // get request
   const currentUserId = req.userId;
@@ -40,7 +40,7 @@ friendController.sendFriendRequest = catchAsync(async (req, res, next) => {
       to: toUserId,
       status: "pending",
     });
-    //res
+    // res
     return sendResponse(res, 200, true, friend, null, "Request sent");
   } else {
     switch (friend.status) {
@@ -69,7 +69,7 @@ friendController.sendFriendRequest = catchAsync(async (req, res, next) => {
         friend.status = "pending";
         await friend.save();
 
-        //res
+        // res
         return sendResponse(
           res,
           200,
@@ -84,7 +84,7 @@ friendController.sendFriendRequest = catchAsync(async (req, res, next) => {
   }
 });
 
-// get list of received pending friend requests (incoming)//
+// get list of received pending friend requests (incoming)
 friendController.getReceivedFriendRequestList = catchAsync(
   async (req, res, next) => {
     // get request
@@ -149,7 +149,7 @@ friendController.getReceivedFriendRequestList = catchAsync(
   }
 );
 
-// get list of sent pending friend requests (outgoing)//
+// get list of sent pending friend requests (outgoing)
 friendController.getSentFriendRequestList = catchAsync(
   async (req, res, next) => {
     // get request
@@ -214,7 +214,7 @@ friendController.getSentFriendRequestList = catchAsync(
   }
 );
 
-// get list of friends//
+// get list of friends
 friendController.getFriendList = catchAsync(async (req, res, next) => {
   // get request
   let { page, limit, ...filter } = { ...req.query };
@@ -278,12 +278,12 @@ friendController.getFriendList = catchAsync(async (req, res, next) => {
   );
 });
 
-// accept/reject a received pending friend request//
+// accept/reject a received pending friend request
 friendController.reactFriendRequest = catchAsync(async (req, res, next) => {
   // get request
-  const currentUserId = req.userId; //to
-  const fromUserId = req.params.userId; //from
-  const { status } = req.body; //status: accepted OR declined
+  const currentUserId = req.userId; // to
+  const fromUserId = req.params.userId; // from
+  const { status } = req.body; // status: accepted OR declined
 
   // validate
   let friend = await Friend.findOne({
@@ -302,7 +302,7 @@ friendController.reactFriendRequest = catchAsync(async (req, res, next) => {
   friend.status = status;
   await friend.save();
 
-  //update friend count
+  // update friend count
   if (status === "accepted") {
     await calculatorFriendCount(currentUserId);
     await calculatorFriendCount(fromUserId);
@@ -319,7 +319,7 @@ friendController.reactFriendRequest = catchAsync(async (req, res, next) => {
   );
 });
 
-// cancel a friend request//
+// cancel a friend request
 friendController.cancelFriendRequest = catchAsync(async (req, res, next) => {
   // get request
   const currentUserId = req.userId;
@@ -338,7 +338,7 @@ friendController.cancelFriendRequest = catchAsync(async (req, res, next) => {
     throw new AppError(400, "Friend request not found", "Cancel request error");
 
   await Friend.findByIdAndDelete(friend._id);
-  // await friend.save(); //////////////////////////////////////////////save after cancel??????
+  // await friend.save();
 
   // response result
   return sendResponse(
@@ -351,7 +351,7 @@ friendController.cancelFriendRequest = catchAsync(async (req, res, next) => {
   );
 });
 
-// remove friend//
+// remove friend
 friendController.removeFriend = catchAsync(async (req, res, next) => {
   // get request
   const currentUserId = req.userId;
@@ -371,7 +371,7 @@ friendController.removeFriend = catchAsync(async (req, res, next) => {
     throw new AppError(400, "Friend not found", "Remove friend error");
   await friend.delete();
 
-  //update friend count
+  // update friend count
   await calculatorFriendCount(currentUserId);
   await calculatorFriendCount(friendId);
 

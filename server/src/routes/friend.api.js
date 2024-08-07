@@ -15,7 +15,7 @@ router.post(
   authentication.loginRequired,
   validators.validate([
     body("to").exists().isString().custom(validators.checkObjectId),
-  ]), //body("id")
+  ]), // body("id")
   friendController.sendFriendRequest
 );
 

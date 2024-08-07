@@ -16,7 +16,7 @@ const calculateCommentCount = async (postId) => {
   await Post.findByIdAndUpdate(postId, { commentCount });
 };
 
-// create a new comment//
+// create a new comment
 commentController.createNewComment = catchAsync(async (req, res, next) => {
   // get data from requests - nhan yeu cau
   const currentUserId = req.userId;
@@ -49,7 +49,7 @@ commentController.createNewComment = catchAsync(async (req, res, next) => {
   );
 });
 
-// update a comment// NOT YET, edit btn
+// update a comment // NOT YET, edit btn
 commentController.updateSingleComment = catchAsync(async (req, res, next) => {
   // get data from requests
   const currentUserId = req.userId;
@@ -82,7 +82,7 @@ commentController.updateSingleComment = catchAsync(async (req, res, next) => {
   );
 });
 
-//delete a comment//
+// delete a comment
 commentController.deleteSingleComment = catchAsync(async (req, res, next) => {
   // get data from requests
   const currentUserId = req.userId;
@@ -114,7 +114,7 @@ commentController.deleteSingleComment = catchAsync(async (req, res, next) => {
   );
 });
 
-//get details of a comment
+// get details of a comment
 commentController.getSingleComment = catchAsync(async (req, res, next) => {
   // get data from requests
   const currentUserId = req.userId;
