@@ -10,7 +10,7 @@ const homeController = require("../controllers/home.controller");
 router.get("/project", homeController.getProjectList);
 
 // - @route GET /startup
-// - @description: startup support program, domain for startup,...
+// - @description: startup sponsorship program, domain for startup,...
 // - @body: name, topLevel, description, ideas, price
 // - @access Public
 router.get("/startup", homeController.getStartupList);

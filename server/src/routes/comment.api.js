@@ -1,10 +1,10 @@
-const express = require("express"); //
-const router = express.Router(); //
-const { body, param } = require("express-validator"); //
+const express = require("express");
+const router = express.Router();
+const { body, param } = require("express-validator");
 
-const authentication = require("../midlewares/authentication"); //
-const validators = require("../midlewares/validators"); //
-const commentController = require("../controllers/comment.controller"); //
+const authentication = require("../midlewares/authentication");
+const validators = require("../midlewares/validators");
+const commentController = require("../controllers/comment.controller");
 const { post } = require("./user.api");
 
 // @route POST/comments

@@ -16,7 +16,7 @@ const calculatePostCount = async (userId) => {
   await User.findByIdAndUpdate(userId, { postCount });
 };
 
-// create a new post// postController.createPost
+// create a new post // postController.createPost
 postController.createPost = catchAsync(async (req, res, next) => {
   // get data from requests - nhan yeu cau
   const currentUserId = req.userId;
@@ -24,7 +24,7 @@ postController.createPost = catchAsync(async (req, res, next) => {
   const { content, image, fromGroup, groupId } = req.body;
 
   // business logic validation - kiem chung database
-  // process -xu ly
+  // process - xu ly
   let post = await Post.create({
     content,
     image,
@@ -75,7 +75,7 @@ postController.updateSinglePost = catchAsync(async (req, res, next) => {
   return sendResponse(
     res, // res
     200, // status
-    true, // success post,
+    true, // success post
     post, // data
     null, // error
     "Update post successfully" // message
@@ -154,7 +154,7 @@ postController.getPosts = catchAsync(async (req, res, next) => {
   const filterConditions = [
     {
       isDeleted: false,
-      fromGroup: false, // not post from group //
+      fromGroup: false, // not post from group
     },
     { author: { $in: userFriendIDs } },
   ];
@@ -190,6 +190,7 @@ postController.deleteSinglePost = catchAsync(async (req, res, next) => {
     { _id: postId, author: currentUserId },
     { isDeleted: true }, // update isDeleted
     { new: true } // sau do tra lai 1 object moi
+    // { $pull: {"postsByGroupId": postId}}
   );
 
   if (!post)
@@ -212,7 +213,7 @@ postController.deleteSinglePost = catchAsync(async (req, res, next) => {
   );
 });
 
-// get comments of a post//
+// get comments of a post
 postController.getCommentsOfPost = catchAsync(async (req, res, next) => {
   // get data from requests
   const postId = req.params.id;
@@ -249,7 +250,7 @@ postController.getAllPosts = catchAsync(async (req, res, next) => {
   // business logic validation - kiem chung database
 
   // process - xu ly
-  page = parseInt(page) || 1; //page
+  page = parseInt(page) || 1; // page
   limit = parseInt(limit) || 10;
 
   // for finding posts

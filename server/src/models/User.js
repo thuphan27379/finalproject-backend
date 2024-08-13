@@ -3,12 +3,12 @@ const Schema = mongoose.Schema;
 const jwt = require("jsonwebtoken"); // token
 
 //
-const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY; //.env
+const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY; // .env
 
 //
 const userSchema = Schema(
   {
-    name: { type: String, required: true }, //username OR company name for show account name
+    name: { type: String, required: true }, // username OR company name for show account name
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true, select: false },
 
@@ -20,14 +20,14 @@ const userSchema = Schema(
     others: { type: String, required: false, default: "" }, // san pham & dich vu
     // & document about product/service
 
-    website: { type: String, required: false, default: "" }, //
+    website: { type: String, required: false, default: "" },
     facebookLink: { type: String, required: false, default: "" },
     instagramLink: { type: String, required: false, default: "" },
     linkedinLink: { type: String, required: false, default: "" },
     twitterLink: { type: String, required: false, default: "" },
     youtubeLink: { type: String, required: false, default: "" },
     //
-    isDeleted: { type: Boolean, default: false, select: false }, //soft delete
+    isDeleted: { type: Boolean, default: false, select: false }, // soft delete
     friendCount: { type: Number, default: 0 },
     postCount: { type: Number, default: 0 },
     friendship: { type: Schema.ObjectId, ref: "Friend" }, // relationship

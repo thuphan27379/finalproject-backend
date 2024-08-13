@@ -15,7 +15,7 @@ router.post(
   authentication.loginRequired,
   validators.validate([
     body("targetType", "Invalid targetType").exists().isIn(["Post", "Comment"]),
-    body("targetId", "Invalid targetId") //targetType trong codecomm-be
+    body("targetId", "Invalid targetId") // targetType
       .exists()
       .custom(validators.checkObjectId),
     body("emoji", "Invalid emoji").exists().isIn(["like", "dislike"]),

@@ -18,7 +18,7 @@ router.get(
   postController.getAllPostsBySelectedUser
 );
 
-// @route GET/posts/
+// @route GET/posts
 // @description get all posts for wall
 // @access login required
 router.get("/", postController.getAllPosts);
@@ -31,7 +31,7 @@ router.post(
   "/",
   authentication.loginRequired,
   validators.validate([body("content", "missing content").exists().notEmpty()]),
-  postController.createPost // createPost ??
+  postController.createPost
 );
 
 // @route PUT/posts/:id

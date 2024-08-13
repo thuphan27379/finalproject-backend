@@ -1,7 +1,7 @@
-const { sendResponse, AppError, catchAsync } = require("../helpers/utils"); //
-const Post = require("../models/Post"); //
+const { sendResponse, AppError, catchAsync } = require("../helpers/utils");
+const Post = require("../models/Post");
 const User = require("../models/User");
-const Comment = require("../models/Comment"); //
+const Comment = require("../models/Comment");
 const Friend = require("../models/Friend");
 
 //

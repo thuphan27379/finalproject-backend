@@ -1,5 +1,4 @@
 const { default: mongoose } = require("mongoose");
-
 const Reaction = require("../models/Reaction");
 const { sendResponse, AppError, catchAsync } = require("../helpers/utils");
 

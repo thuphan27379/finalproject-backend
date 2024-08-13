@@ -8,7 +8,7 @@ const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY;
 // startup
 // domain
 const domainSchema = Schema({
-  topLevel: { type: String, required: true }, // .com
+  topLevel: { type: String, required: true }, // .com .net .org ...
   name: { type: String, required: true }, // domain
   subName: { type: String }, // www.subName.domain.com
   subDir: { type: String }, //  www.domain.com/subDir

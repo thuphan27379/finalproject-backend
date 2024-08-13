@@ -31,11 +31,12 @@ contactController.sendContact = catchAsync(async (req, res, next) => {
 
     // Message object, content of the contact form
     let message = {
-      from: `${email}`,
-      to: "<myrtice.turner@ethereal.email>", // , thuphan273@gmail.com
-      subject: "Contact from website", // `${name}`
+      subject: `Contact from website of ${name}`,
+      from: `${name} ${email}`,
+      to: "myrtice.turner@ethereal.email, thuphan273@gmail.com", // , thuphan273@gmail.com ?
       text: `${story}`, // Plaintext
-      html: "<p>Hello</p>", // HTML
+      html: `<p>${story}</p>`, // HTML
+      replyTo: "thuphan273@gmail.com", // ?
     };
 
     //
@@ -51,14 +52,7 @@ contactController.sendContact = catchAsync(async (req, res, next) => {
     });
 
     // response
-    return sendResponse(
-      res,
-      200,
-      true,
-      null,
-      // transporter, // ? state to FE
-      "Send contact successfully"
-    );
+    return sendResponse(res, 200, true, null, "Send contact successfully");
   });
 });
 

@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const { body, param } = require("express-validator");
 
-const userController = require("../controllers/user.controller"); // ?!
+const userController = require("../controllers/user.controller");
 const validators = require("../midlewares/validators");
 const authentication = require("../midlewares/authentication");
 
@@ -47,7 +47,7 @@ router.get(
   userController.getSingleUser
 );
 
-// @route PUT/users/:id/
+// @route PUT/users/:id
 // @description update user profile
 // @body (name, avatarURL, aboutMe, city, country, company, jobtitle, social links)
 // @access log in required

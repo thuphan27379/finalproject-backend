@@ -10,7 +10,6 @@ const userController = {};
 // register new user/create a new account
 // catchAsync \helpers\utils.js
 userController.register = catchAsync(async (req, res, next) => {
-  // try {
   // get data from requests - nhan yeu cau
   let { name, email, password } = req.body;
 
@@ -24,15 +23,17 @@ userController.register = catchAsync(async (req, res, next) => {
   password = await bcrypt.hash(password, salt);
 
   user = await User.create({ name, email, password }); // create a new account
-  // const accessToken = await user.generateToken()
+  const accessToken = await user.generateToken();
 
   // response result, success or not
-  sendResponse(res, 200, true, { user }, null, "Create user successfully");
-  // } catch (error) {
-  //   next(error);
-  // }
-
-  // res.send("user registration");
+  sendResponse(
+    res,
+    200,
+    true,
+    { user, accessToken },
+    null,
+    "Create user successfully"
+  );
 });
 
 // get users with pagination and filter

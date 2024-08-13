@@ -9,9 +9,9 @@ const User = require("../models/User");
 const groupSchema = Schema(
   {
     creator: { type: Schema.Types.ObjectId, ref: "User" }, // (users ID)
-    name: { type: String, required: true }, //
-    description: { type: String, required: true }, //
-    interests: [{ type: String, required: true }], //
+    name: { type: String, required: true },
+    description: { type: String, required: true },
+    interests: [{ type: String, required: true }],
 
     members: [{ type: Schema.Types.ObjectId, ref: "User" }], // (users ID list)
     // list posts by group

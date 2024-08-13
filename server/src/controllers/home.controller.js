@@ -1,5 +1,5 @@
 // company
-const { sendResponse, AppError, catchAsync } = require("../helpers/utils"); //
+const { sendResponse, AppError, catchAsync } = require("../helpers/utils");
 const Domain = require("../models/Domain");
 
 // /project   isProject: true
@@ -29,7 +29,7 @@ homeController.getDomainList = catchAsync(async (req, res, next) => {
   const offset = limit * (page - 1);
 
   const domainsForSale = await Domain.find(query).limit(limit).skip(offset);
-  console.log("domain", domainForSale);
+  // console.log("domain", domainForSale);
 
   const domains = domainsForSale.map((domain) => {
     return {
@@ -109,11 +109,11 @@ homeController.getProjectList = catchAsync(async (req, res, next) => {
   // business logic validation
 
   // process
-  page = parseInt(page) || 1; //page
+  page = parseInt(page) || 1; // page
   limit = parseInt(limit) || 10;
 
   const domainProject = await Domain.find({
-    isProject: true, //
+    isProject: true,
   });
   // console.log("projects", domainProject);
 

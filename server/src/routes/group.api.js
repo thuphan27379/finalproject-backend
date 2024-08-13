@@ -1,6 +1,6 @@
-const express = require("express"); //
-const router = express.Router(); //
-const { body, param } = require("express-validator"); //
+const express = require("express");
+const router = express.Router();
+const { body, param } = require("express-validator");
 
 const authController = require("../controllers/auth.controller"); // accessToken for login require
 const validators = require("../midlewares/validators"); // validate input data of request
@@ -38,7 +38,7 @@ router.get(
   groupController.getListOfGroups
 );
 
-// @route PUT/group ???/members
+// @route PUT/group ? /members
 // @description join a group (add user into members list)
 // @body (userId, groupId)
 // @access login required
@@ -52,7 +52,7 @@ router.put(
   groupController.joinGroup
 );
 
-// @route DELETE/group ???/members Or PUT ?
+// @route DELETE/group ? /members Or PUT ?
 // @description leave a group (delete user in members list)
 // @body (userId, groupId)
 // @access login required
@@ -78,7 +78,7 @@ router.get(
   groupController.getSingleGroup
 );
 
-// @route GET/group/members ???params groupId
+// @route GET/group/members ? params groupId
 // @description get list of members (memberList)
 // @body (userId, groupId)
 // @access login required

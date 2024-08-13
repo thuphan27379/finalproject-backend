@@ -13,24 +13,24 @@ const Friend = require("../models/Friend");
 const groupController = {};
 
 // membersCount //Group.members[]
-// const calculateMembersCount = async (userId) => {
-//   const membersCount = await Group.countDocuments({
-//     members: userId,
-//   });
-//   console.log(membersCount);
-//   await Group.findByIdAndUpdate(userId, { membersCount });
-// };
+const calculateMembersCount = async (userId) => {
+  const membersCount = await Group.countDocuments({
+    members: userId,
+  });
+  console.log(membersCount);
+  await Group.findByIdAndUpdate(userId, { membersCount });
+};
 
-// postsCount
-// const calculatePostsCount = async (groupId) => {
-//   const postsCount = await Post.countDocuments({
-//     group: groupId,
-//     post: postId,
-//     author: userId,
-//     isDeleted: false,
-//   });
-//   await Group.findByIdAndUpdate(groupId, { postsCount });
-// };
+// postsCount Group.postsByGroupId[]
+const calculatePostsCount = async (groupId) => {
+  const postsCount = await Post.countDocuments({
+    group: groupId,
+    post: postId,
+    author: userId,
+    isDeleted: false,
+  });
+  await Group.findByIdAndUpdate(groupId, { postsCount });
+};
 
 // create a new group - groupForm.js (fe)
 groupController.createNewGroup = catchAsync(async (req, res, next) => {
@@ -49,7 +49,7 @@ groupController.createNewGroup = catchAsync(async (req, res, next) => {
 
   // process - xu ly
   let newGroup = await Group.create({
-    creator: currentUserId, //members
+    creator: currentUserId, // members
     name,
     description,
     interests,
@@ -146,7 +146,7 @@ groupController.joinGroup = catchAsync(async (req, res, next) => {
 
   // check join chua
   if (group.members.includes(currentUserId))
-    throw new AppError(400, "User already join", "Join a group error");
+    throw new AppError(400, "User already joined", "Join a group error");
 
   // process - update members list
   const joinGroup = await Group.findByIdAndUpdate(
@@ -169,7 +169,7 @@ groupController.joinGroup = catchAsync(async (req, res, next) => {
 // leave a group .findByIdAndDelete(userId) in members []
 groupController.leaveGroup = catchAsync(async (req, res, next) => {
   // get data from requests
-  const currentUserId = req.userId;
+  const currentUserId = req.params.userId;
   const currentGroupId = req.params.groupId;
 
   // business logic validation
@@ -276,7 +276,7 @@ groupController.createNewGroupPost = catchAsync(async (req, res, next) => {
     content,
     image,
     author: currentUserId,
-    fromGroup: true, // post of the group //
+    fromGroup: true, // post of the group
   });
   // console.log(groupPost);
   // console.log(group);
@@ -367,18 +367,18 @@ groupController.getListOfMembers = catchAsync(async (req, res, next) => {
   let { page, limit } = { ...req.query };
 
   // business logic validation
-  let user = await User.findById(userId); //check userId in database exist or not
+  let user = await User.findById(userId); // check userId in database exist or not
   if (!user)
     throw new AppError(400, "User is not found", "Get groups list error");
 
-  page = parseInt(page) || 1; //page
+  page = parseInt(page) || 1; // page
   limit = parseInt(limit) || 10;
 
   // process
   // for find friends's ID to get friend's posts
   let groupsId = await Group.find({});
 
-  // for finding groups ???
+  // for finding groups ?
   const filterConditions = [
     { isDeleted: false },
     { author: { $in: groupIDs } },
@@ -393,7 +393,7 @@ groupController.getListOfMembers = catchAsync(async (req, res, next) => {
   const totalPages = Math.ceil(count / limit);
   const offset = limit * (page - 1);
 
-  // return groups and page ???
+  // return groups and page ?
   let groups = await Group.find(filterCriteria)
     .sort({ createdAt: -1 })
     .skip(offset)
@@ -420,7 +420,7 @@ groupController.getMember = catchAsync(async (req, res, next) => {
   let memberId = [];
 
   // business logic validation
-  let user = await User.findById(userId); //check userId in database exist or not
+  let user = await User.findById(userId); // check userId in database exist or not
   if (!user)
     throw new AppError(
       400,
@@ -429,8 +429,6 @@ groupController.getMember = catchAsync(async (req, res, next) => {
     );
 
   // process
-
-  //
   let member = await Group.findById(groupsId);
 
   // response result

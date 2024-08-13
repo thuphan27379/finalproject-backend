@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-// const { response } = require("../app");
 const Schema = mongoose.Schema;
 
 //
@@ -7,7 +6,7 @@ const commentSchema = Schema(
   {
     content: { type: String, required: true },
     author: { type: Schema.ObjectId, required: true, ref: "User" },
-    post: { type: Schema.ObjectId, required: true, ref: "Blog" }, //ref: "Post"
+    post: { type: Schema.ObjectId, required: true, ref: "Blog" }, // ref: "Post"
     //
     reactions: {
       like: { type: Number, default: 0 },

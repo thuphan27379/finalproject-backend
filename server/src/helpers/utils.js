@@ -23,7 +23,7 @@ class AppError extends Error {
     this.errorType = errorType;
     // all errors using this class are operational errors
     this.isOperational = true;
-    // create a stack trace for debugging (error obj, void obj to avoid stack polution)
+    // create a stack trace for debugging (error obj, void obj to avoid stack population)
     Error.captureStackTrace(this, this.constructor);
   }
 }

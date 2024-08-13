@@ -5,11 +5,11 @@ const { sendResponse, AppError } = require("../helpers/utils");
 
 /* GET home page. */
 router.get("/", function (req, res, next) {
-  res.send({ status: "ok", data: "hello" }); //
+  res.send({ status: "ok", data: "hello" });
 });
 
 // API
-// contact us form ?
+// contact us form
 const contactApi = require("./contact.api");
 router.use("/contact", contactApi);
 
@@ -41,7 +41,7 @@ router.use("/friends", friendApi);
 const reactionApi = require("./reaction.api");
 router.use("/reactions", reactionApi);
 
-// groupApi /blog/group &/group/:groupId
+// groupApi /blog/group  OR /group/:groupId
 const groupApi = require("./group.api");
 router.use("/group", groupApi);
 
