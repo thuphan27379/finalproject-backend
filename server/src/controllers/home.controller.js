@@ -1,7 +1,11 @@
-// company
-const { sendResponse, AppError, catchAsync } = require("../helpers/utils");
-const Domain = require("../models/Domain");
+// biome-ignore lint/suspicious/noShadowRestrictedNames: <explanation>
+const { Promise } = require('mongoose');
 
+const { sendResponse, AppError, catchAsync } = require('../helpers/utils');
+const Domain = require('../models/Domain');
+
+// MINH THU
+// company
 // /project   isProject: true
 // /startup   isStartup: true
 // /domain    isSale: true
@@ -16,10 +20,12 @@ homeController.getDomainList = catchAsync(async (req, res, next) => {
   // business logic validation
 
   // process
+  // biome-ignore lint/style/useNumberNamespace: <explanation>
   page = parseInt(page) || 1; // page number
+  // biome-ignore lint/style/useNumberNamespace: <explanation>
   limit = parseInt(limit) || 20;
 
-  const searchQuery = q ? { name: { $regex: `${q}`, $options: "i" } } : {}; // search by name
+  const searchQuery = q ? { name: { $regex: `${q}`, $options: 'i' } } : {}; // search by name
   const domainForSale = { isSale: true };
   const query = { $and: [domainForSale, searchQuery] };
 
@@ -49,7 +55,7 @@ homeController.getDomainList = catchAsync(async (req, res, next) => {
     true,
     { domains, totalPages, currentPage, count },
     null,
-    "Get domains for sale successfully"
+    'Get domains for sale successfully'
   );
 });
 
@@ -62,11 +68,13 @@ homeController.getStartupList = catchAsync(async (req, res, next) => {
   // business logic validation
 
   // process
+  // biome-ignore lint/style/useNumberNamespace: <explanation>
   page = parseInt(page) || 1; // page
+  // biome-ignore lint/style/useNumberNamespace: <explanation>
   limit = parseInt(limit) || 20;
 
   // search
-  const searchQuery = q ? { name: { $regex: `${q}`, $options: "i" } } : {};
+  const searchQuery = q ? { name: { $regex: `${q}`, $options: 'i' } } : {};
   const domainForStartup = { isStartup: true };
   const query = { $and: [domainForStartup, searchQuery] };
 
@@ -97,7 +105,7 @@ homeController.getStartupList = catchAsync(async (req, res, next) => {
     true,
     { startups, totalPages, currentPage },
     null,
-    "Get domains for startup successfully"
+    'Get domains for startup successfully'
   );
 });
 
@@ -109,7 +117,9 @@ homeController.getProjectList = catchAsync(async (req, res, next) => {
   // business logic validation
 
   // process
+  // biome-ignore lint/style/useNumberNamespace: <explanation>
   page = parseInt(page) || 1; // page
+  // biome-ignore lint/style/useNumberNamespace: <explanation>
   limit = parseInt(limit) || 10;
 
   const domainProject = await Domain.find({
@@ -140,7 +150,7 @@ homeController.getProjectList = catchAsync(async (req, res, next) => {
     true,
     { projects },
     null,
-    "Get projects list successfully"
+    'Get projects list successfully'
   );
 });
 

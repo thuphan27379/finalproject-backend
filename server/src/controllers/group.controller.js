@@ -1,15 +1,16 @@
-const { Promise } = require("mongoose");
+// biome-ignore lint/suspicious/noShadowRestrictedNames: <explanation>
+const { Promise } = require('mongoose');
 
-const { sendResponse, AppError, catchAsync } = require("../helpers/utils");
-const { use } = require("../routes/group.api");
-const Group = require("../models/Group");
-const User = require("../models/User");
-const Post = require("../models/Post");
-const Comment = require("../models/Comment");
-const Reaction = require("../models/Reaction");
-const Friend = require("../models/Friend");
+const { sendResponse, AppError, catchAsync } = require('../helpers/utils');
+const { use } = require('../routes/group.api');
+const Group = require('../models/Group');
+const User = require('../models/User');
+const Post = require('../models/Post');
+const Comment = require('../models/Comment');
+const Reaction = require('../models/Reaction');
+const Friend = require('../models/Friend');
 
-//
+// MINH THU
 const groupController = {};
 
 // membersCount //Group.members[]
@@ -36,6 +37,7 @@ const calculatePostsCount = async (groupId) => {
 groupController.createNewGroup = catchAsync(async (req, res, next) => {
   // get data from requests - nhan yeu cau
   const currentUserId = req.userId;
+  // biome-ignore lint/style/useConst: <explanation>
   let { name, description, interests } = req.body; // input
 
   // business logic validation
@@ -43,11 +45,12 @@ groupController.createNewGroup = catchAsync(async (req, res, next) => {
   if (!user)
     throw new AppError(
       400,
-      "Only user logged in is able to create a group",
-      "Create new group error"
+      'Only user logged in is able to create a group',
+      'Create new group error'
     );
 
   // process - xu ly
+  // biome-ignore lint/style/useConst: <explanation>
   let newGroup = await Group.create({
     creator: currentUserId, // members
     name,
@@ -70,7 +73,7 @@ groupController.createNewGroup = catchAsync(async (req, res, next) => {
     true,
     { newGroup },
     null,
-    "Create a new group successfully"
+    'Create a new group successfully'
   );
 });
 
@@ -81,21 +84,26 @@ groupController.getListOfGroups = catchAsync(async (req, res, next) => {
   let { page, limit, ...filter } = { ...req.query };
 
   // business logic validation
+  // biome-ignore lint/style/useConst: <explanation>
   let user = await User.findById(currentUserId); // check userId in database exist or not
   if (!user)
-    throw new AppError(400, "Group is not found", "Get groups list error");
+    throw new AppError(400, 'Group is not found', 'Get groups list error');
 
+  // biome-ignore lint/style/useNumberNamespace: <explanation>
   page = parseInt(page) || 1; // page
+  // biome-ignore lint/style/useNumberNamespace: <explanation>
   limit = parseInt(limit) || 10;
 
   // process
+  // biome-ignore lint/style/useConst: <explanation>
   let groupsId = await Group.find({}); //???
 
   // for finding groups by name
   const filterConditions = [{ isDeleted: false }];
   if (filter.name) {
     filterConditions.push({
-      ["name"]: { $regex: filter.name, $options: "i" },
+      // biome-ignore lint/complexity/useLiteralKeys: <explanation>
+      ['name']: { $regex: filter.name, $options: 'i' },
     });
   }
 
@@ -109,6 +117,7 @@ groupController.getListOfGroups = catchAsync(async (req, res, next) => {
   const offset = limit * (page - 1);
 
   // return groups and page
+  // biome-ignore lint/style/useConst: <explanation>
   let groups = await Group.find(filterCriteria)
     .sort({ createdAt: -1 })
     .skip(offset)
@@ -121,7 +130,7 @@ groupController.getListOfGroups = catchAsync(async (req, res, next) => {
     true,
     { groups, totalGroups },
     null,
-    "Get list of groups successfully"
+    'Get list of groups successfully'
   );
 });
 
@@ -137,16 +146,16 @@ groupController.joinGroup = catchAsync(async (req, res, next) => {
   if (!user)
     throw new AppError(
       400,
-      "User not found Or Only user logged in is able to join group",
-      "Join a group error"
+      'User not found Or Only user logged in is able to join group',
+      'Join a group error'
     );
 
   const group = await Group.findById(currentGroupId);
-  if (!group) throw new AppError(400, "Group not found", "Join a group error");
+  if (!group) throw new AppError(400, 'Group not found', 'Join a group error');
 
   // check join chua
   if (group.members.includes(currentUserId))
-    throw new AppError(400, "User already joined", "Join a group error");
+    throw new AppError(400, 'User already joined', 'Join a group error');
 
   // process - update members list
   const joinGroup = await Group.findByIdAndUpdate(
@@ -162,7 +171,7 @@ groupController.joinGroup = catchAsync(async (req, res, next) => {
     true,
     { joinGroup },
     null,
-    "Join a group successfully"
+    'Join a group successfully'
   );
 });
 
@@ -177,16 +186,16 @@ groupController.leaveGroup = catchAsync(async (req, res, next) => {
   if (!user)
     throw new AppError(
       400,
-      "User not found Or Only user logged in is able to leave group",
-      "Leave a group error"
+      'User not found Or Only user logged in is able to leave group',
+      'Leave a group error'
     );
 
   const group = await Group.findById(currentGroupId);
-  if (!group) throw new AppError(400, "Group not found", "Leave a group error");
+  if (!group) throw new AppError(400, 'Group not found', 'Leave a group error');
 
   // check join chua
   if (!group.members.includes(currentUserId))
-    throw new AppError(400, "User is not a member", "Leave a group error");
+    throw new AppError(400, 'User is not a member', 'Leave a group error');
 
   // process
   const leaveGroup = await Group.findByIdAndUpdate(
@@ -204,7 +213,7 @@ groupController.leaveGroup = catchAsync(async (req, res, next) => {
     true,
     { leaveGroup },
     null,
-    "Leave a group successfully"
+    'Leave a group successfully'
   );
 });
 
@@ -220,14 +229,14 @@ groupController.getSingleGroup = catchAsync(async (req, res, next) => {
   if (!user)
     throw new AppError(
       400,
-      "User not found Or Only user logged in is able to get single group",
-      "Get single group error"
+      'User not found Or Only user logged in is able to get single group',
+      'Get single group error'
     );
 
   // check group
   const group = await Group.findById(currentGroupId);
   if (!group)
-    throw new AppError(400, "Group not found", "Get single group error");
+    throw new AppError(400, 'Group not found', 'Get single group error');
 
   // process
   const singleGroup = await Group.findById(currentGroupId);
@@ -239,7 +248,7 @@ groupController.getSingleGroup = catchAsync(async (req, res, next) => {
     true,
     { singleGroup: group }, //, name, interests
     null,
-    "Get single group successfully"
+    'Get single group successfully'
   );
 });
 
@@ -255,23 +264,24 @@ groupController.createNewGroupPost = catchAsync(async (req, res, next) => {
   if (!user)
     throw new AppError(
       400,
-      "Only user logged in is able to post in the group",
-      "Create new post in the group error"
+      'Only user logged in is able to post in the group',
+      'Create new post in the group error'
     );
 
   const group = await Group.findById(currentGroupId);
   if (!group)
     throw new AppError(
       400,
-      "Group not found",
-      "Create new post in the group error"
+      'Group not found',
+      'Create new post in the group error'
     );
 
   // check member join
   if (!group.members.includes(currentUserId))
-    throw new AppError(400, "User has not join yet", "Post in the group error");
+    throw new AppError(400, 'User has not join yet', 'Post in the group error');
 
   // process
+  // biome-ignore lint/style/useConst: <explanation>
   let groupPost = await Post.create({
     content,
     image,
@@ -283,7 +293,7 @@ groupController.createNewGroupPost = catchAsync(async (req, res, next) => {
 
   // check post
   if (group.postsByGroupId.includes(groupPost._id))
-    throw new AppError(400, "Post already have", "Post in the group error");
+    throw new AppError(400, 'Post already have', 'Post in the group error');
 
   // update group model
   const groupPostId = await Group.findByIdAndUpdate(
@@ -301,7 +311,7 @@ groupController.createNewGroupPost = catchAsync(async (req, res, next) => {
     true,
     { groupPostId },
     null,
-    "Create new post in the group successfully"
+    'Create new post in the group successfully'
   );
 });
 
@@ -312,37 +322,40 @@ groupController.getListOfPosts = catchAsync(async (req, res, next) => {
   const currentGroupId = req.params.groupId;
 
   // business logic validation
+  // biome-ignore lint/style/useConst: <explanation>
   let user = await User.findById(currentUserId); // check userId in database exist or not
   if (!user)
     throw new AppError(
       400,
-      "User is not found",
-      "Get posts list of the group error"
+      'User is not found',
+      'Get posts list of the group error'
     );
 
   const group = await Group.findById(currentGroupId);
   if (!group)
     throw new AppError(
       400,
-      "List Posts Group not found",
-      "Get posts list of the group error"
+      'List Posts Group not found',
+      'Get posts list of the group error'
     );
 
   // check member join
   if (!group.members.includes(currentUserId))
     throw new AppError(
       400,
-      "User has not join group yet",
-      "Get posts list of the group error"
+      'User has not join group yet',
+      'Get posts list of the group error'
     );
 
   // process
+  // biome-ignore lint/style/useConst: <explanation>
   let groupPostsList = await Group.findById(currentGroupId).populate({
-    path: "postsByGroupId",
+    path: 'postsByGroupId',
     match: { isDeleted: false, fromGroup: true }, // post of group
-    populate: { path: "author" }, // populate author cua post
+    populate: { path: 'author' }, // populate author cua post
   });
 
+  // biome-ignore lint/style/useConst: <explanation>
   let postGroupCount = groupPostsList.postsByGroupId.length;
 
   // response result
@@ -352,7 +365,7 @@ groupController.getListOfPosts = catchAsync(async (req, res, next) => {
     true,
     { groupPostsList, postGroupCount },
     null,
-    "Get list of group posts successfully"
+    'Get list of group posts successfully'
   );
 });
 
@@ -362,26 +375,31 @@ groupController.getListOfMembers = catchAsync(async (req, res, next) => {
   const currentUserId = req.userId;
   const currentGroupId = req.groupId;
 
+  // biome-ignore lint/style/useConst: <explanation>
   let members = [];
 
   let { page, limit } = { ...req.query };
 
   // business logic validation
+  // biome-ignore lint/style/useConst: <explanation>
   let user = await User.findById(userId); // check userId in database exist or not
   if (!user)
-    throw new AppError(400, "User is not found", "Get groups list error");
+    throw new AppError(400, 'User is not found', 'Get groups list error');
 
+  // biome-ignore lint/style/useNumberNamespace: <explanation>
   page = parseInt(page) || 1; // page
+  // biome-ignore lint/style/useNumberNamespace: <explanation>
   limit = parseInt(limit) || 10;
 
   // process
   // for find friends's ID to get friend's posts
+  // biome-ignore lint/style/useConst: <explanation>
   let groupsId = await Group.find({});
 
   // for finding groups ?
   const filterConditions = [
     { isDeleted: false },
-    { author: { $in: groupIDs } },
+    { author: { $in: groupIDs } }, //
   ];
 
   const filterCriteria = filterConditions.length
@@ -394,11 +412,12 @@ groupController.getListOfMembers = catchAsync(async (req, res, next) => {
   const offset = limit * (page - 1);
 
   // return groups and page ?
+  // biome-ignore lint/style/useConst: <explanation>
   let groups = await Group.find(filterCriteria)
     .sort({ createdAt: -1 })
     .skip(offset)
     .limit(limit)
-    .populate("author");
+    .populate('author'); //
 
   // response result
   return sendResponse(
@@ -407,7 +426,7 @@ groupController.getListOfMembers = catchAsync(async (req, res, next) => {
     true,
     { membersList },
     null,
-    "Get list of members successfully"
+    'Get list of members successfully'
   );
 });
 
@@ -417,18 +436,21 @@ groupController.getMember = catchAsync(async (req, res, next) => {
   const currentUserId = req.userId;
   const currentGroupId = req.groupId;
 
+  // biome-ignore lint/style/useConst: <explanation>
   let memberId = [];
 
   // business logic validation
+  // biome-ignore lint/style/useConst: <explanation>
   let user = await User.findById(userId); // check userId in database exist or not
   if (!user)
     throw new AppError(
       400,
-      "User is not found",
-      "Get single member of group error"
+      'User is not found',
+      'Get single member of group error'
     );
 
   // process
+  // biome-ignore lint/style/useConst: <explanation>
   let member = await Group.findById(groupsId);
 
   // response result
@@ -438,7 +460,7 @@ groupController.getMember = catchAsync(async (req, res, next) => {
     true,
     { member },
     null,
-    "Get member Id successfully"
+    'Get member Id successfully'
   );
 });
 

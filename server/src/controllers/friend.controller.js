@@ -1,6 +1,6 @@
-const { sendResponse, AppError, catchAsync } = require("../helpers/utils");
-const User = require("../models/User");
-const Friend = require("../models/Friend");
+const { sendResponse, AppError, catchAsync } = require('../helpers/utils');
+const User = require('../models/User');
+const Friend = require('../models/Friend');
 
 //
 const friendController = {};
@@ -9,7 +9,7 @@ const friendController = {};
 const calculatorFriendCount = async (userId) => {
   const friendCount = await Friend.countDocuments({
     $or: [{ from: userId }, { to: userId }],
-    status: "accepted",
+    status: 'accepted',
   });
   await User.findByIdAndUpdate(userId, { friendCount: friendCount });
 };
@@ -23,7 +23,7 @@ friendController.sendFriendRequest = catchAsync(async (req, res, next) => {
   // check DB
   const user = await User.findById(toUserId);
   if (!user)
-    throw new AppError(400, "User not found", "Send friend request error");
+    throw new AppError(400, 'User not found', 'Send friend request error');
 
   // check friend relationship
   let friend = await Friend.findOne({
@@ -38,35 +38,37 @@ friendController.sendFriendRequest = catchAsync(async (req, res, next) => {
     friend = await Friend.create({
       from: currentUserId,
       to: toUserId,
-      status: "pending",
+      status: 'pending',
     });
     // res
-    return sendResponse(res, 200, true, friend, null, "Request sent");
+    return sendResponse(res, 200, true, friend, null, 'Request sent');
+    // biome-ignore lint/style/noUselessElse: <explanation>
   } else {
     switch (friend.status) {
       // status === pending => error: already sent
-      case "pending":
+      case 'pending':
         if (friend.from.equals(currentUserId)) {
           throw new AppError(
             400,
-            "You have already send request to this user",
-            "Add friend error"
+            'You have already send request to this user',
+            'Add friend error'
           );
+          // biome-ignore lint/style/noUselessElse: <explanation>
         } else {
           throw new AppError(
             400,
-            "You have received a request from this user",
-            "Add friend error"
+            'You have received a request from this user',
+            'Add friend error'
           );
         }
       // status === accepted => error: already sent
-      case "accepted":
-        throw new AppError(400, "Users are already friend", "Add friend error");
+      case 'accepted':
+        throw new AppError(400, 'Users are already friend', 'Add friend error');
       // status === declined => update status to pending sent request, send again
-      case "declined":
+      case 'declined':
         friend.from = currentUserId;
         friend.to = toUserId;
-        friend.status = "pending";
+        friend.status = 'pending';
         await friend.save();
 
         // res
@@ -76,10 +78,10 @@ friendController.sendFriendRequest = catchAsync(async (req, res, next) => {
           true,
           friend,
           null,
-          "Send request successfully"
+          'Send request successfully'
         );
       default:
-        throw new AppError(400, "Friend status undefined", "Add friend error");
+        throw new AppError(400, 'Friend status undefined', 'Add friend error');
     }
   }
 });
@@ -92,9 +94,10 @@ friendController.getReceivedFriendRequestList = catchAsync(
     const currentUserId = req.userId;
 
     // validate
+    // biome-ignore lint/style/useConst: <explanation>
     let requestList = await Friend.find({
       to: currentUserId,
-      status: "pending",
+      status: 'pending',
     });
 
     const requesterIDs = requestList.map((friend) => {
@@ -107,7 +110,7 @@ friendController.getReceivedFriendRequestList = catchAsync(
 
     if (filter.name) {
       filterConditions.push({
-        [name]: { $regrex: filter.name, $options: "i" },
+        [name]: { $regrex: filter.name, $options: 'i' },
       });
     }
 
@@ -115,7 +118,9 @@ friendController.getReceivedFriendRequestList = catchAsync(
       ? { $and: filterConditions }
       : {};
     //
+    // biome-ignore lint/style/useNumberNamespace: <explanation>
     page = parseInt(page) || 1;
+    // biome-ignore lint/style/useNumberNamespace: <explanation>
     limit = parseInt(limit) || 10;
     const count = await User.countDocuments(filterCriteria);
     const totalPages = Math.ceil(count / limit);
@@ -128,6 +133,7 @@ friendController.getReceivedFriendRequestList = catchAsync(
 
     // show friend relationship
     const usersWithFriendship = users.map((user) => {
+      // biome-ignore lint/style/useConst: <explanation>
       let temp = user.toJSON();
       temp.friendship = requestList.find((friendship) => {
         if (friendship.from.equals(user._id) || friendship.to.equals(user._id))
@@ -157,9 +163,10 @@ friendController.getSentFriendRequestList = catchAsync(
     const currentUserId = req.userId;
 
     // validate
+    // biome-ignore lint/style/useConst: <explanation>
     let requestList = await Friend.find({
       from: currentUserId,
-      status: "pending",
+      status: 'pending',
     });
 
     const recipientIDs = requestList.map((friend) => {
@@ -172,7 +179,8 @@ friendController.getSentFriendRequestList = catchAsync(
 
     if (filter.name) {
       filterConditions.push({
-        ["name"]: { $regrex: filter.name, $options: "i" },
+        // biome-ignore lint/complexity/useLiteralKeys: <explanation>
+        ['name']: { $regrex: filter.name, $options: 'i' },
       });
     }
 
@@ -180,7 +188,9 @@ friendController.getSentFriendRequestList = catchAsync(
       ? { $and: filterConditions }
       : {};
     //
+    // biome-ignore lint/style/useNumberNamespace: <explanation>
     page = parseInt(page) || 1;
+    // biome-ignore lint/style/useNumberNamespace: <explanation>
     limit = parseInt(limit) || 10;
     const count = await User.countDocuments(filterCriteria);
     const totalPages = Math.ceil(count / limit);
@@ -193,6 +203,7 @@ friendController.getSentFriendRequestList = catchAsync(
 
     // show relationship
     const usersWithFriendship = users.map((user) => {
+      // biome-ignore lint/style/useConst: <explanation>
       let temp = user.toJSON();
       temp.friendship = requestList.find((friendship) => {
         if (friendship.from.equals(user._id) || friendship.to.equals(user._id))
@@ -221,9 +232,10 @@ friendController.getFriendList = catchAsync(async (req, res, next) => {
   const currentUserId = req.userId;
 
   // validate
+  // biome-ignore lint/style/useConst: <explanation>
   let friendList = await Friend.find({
     $or: [{ from: currentUserId }, { to: currentUserId }],
-    status: "accepted",
+    status: 'accepted',
   });
 
   const friendIDs = friendList.map((friend) => {
@@ -236,7 +248,8 @@ friendController.getFriendList = catchAsync(async (req, res, next) => {
 
   if (filter.name) {
     filterConditions.push({
-      ["name"]: { $regrex: filter.name, $options: "i" },
+      // biome-ignore lint/complexity/useLiteralKeys: <explanation>
+      ['name']: { $regrex: filter.name, $options: 'i' },
     });
   }
 
@@ -244,7 +257,9 @@ friendController.getFriendList = catchAsync(async (req, res, next) => {
     ? { $and: filterConditions }
     : {};
   //
+  // biome-ignore lint/style/useNumberNamespace: <explanation>
   page = parseInt(page) || 1;
+  // biome-ignore lint/style/useNumberNamespace: <explanation>
   limit = parseInt(limit) || 10;
   const count = await User.countDocuments(filterCriteria);
   const totalPages = Math.ceil(count / limit);
@@ -257,6 +272,7 @@ friendController.getFriendList = catchAsync(async (req, res, next) => {
 
   // hien thi tinh trang friendship, sent request when and who sent
   const usersWithFriendship = users.map((user) => {
+    // biome-ignore lint/style/useConst: <explanation>
     let temp = user.toJSON();
 
     temp.friendship = friendList.find((friendship) => {
@@ -286,24 +302,25 @@ friendController.reactFriendRequest = catchAsync(async (req, res, next) => {
   const { status } = req.body; // status: accepted OR declined
 
   // validate
+  // biome-ignore lint/style/useConst: <explanation>
   let friend = await Friend.findOne({
     from: fromUserId,
     to: currentUserId,
-    status: "pending",
+    status: 'pending',
   });
 
   // process
   if (!friend)
     throw new AppError(
       400,
-      "Friend request not found",
-      "React friend request error"
+      'Friend request not found',
+      'React friend request error'
     );
   friend.status = status;
   await friend.save();
 
   // update friend count
-  if (status === "accepted") {
+  if (status === 'accepted') {
     await calculatorFriendCount(currentUserId);
     await calculatorFriendCount(fromUserId);
   }
@@ -315,7 +332,7 @@ friendController.reactFriendRequest = catchAsync(async (req, res, next) => {
     true,
     friend,
     null,
-    "React friend request successfully"
+    'React friend request successfully'
   );
 });
 
@@ -329,13 +346,13 @@ friendController.cancelFriendRequest = catchAsync(async (req, res, next) => {
   const friend = await Friend.findOne({
     from: currentUserId,
     to: toUserId,
-    status: "pending",
+    status: 'pending',
   });
   // console.log("friend id", friend);
 
   // process logic
   if (!friend)
-    throw new AppError(400, "Friend request not found", "Cancel request error");
+    throw new AppError(400, 'Friend request not found', 'Cancel request error');
 
   await Friend.findByIdAndDelete(friend._id);
   // await friend.save();
@@ -347,7 +364,7 @@ friendController.cancelFriendRequest = catchAsync(async (req, res, next) => {
     true,
     friend,
     null,
-    "Friend request has been cancelled"
+    'Friend request has been cancelled'
   );
 });
 
@@ -363,12 +380,12 @@ friendController.removeFriend = catchAsync(async (req, res, next) => {
       { from: currentUserId, to: friendId },
       { from: friendId, to: currentUserId },
     ],
-    status: "accepted",
+    status: 'accepted',
   });
 
   // process
   if (!friend)
-    throw new AppError(400, "Friend not found", "Remove friend error");
+    throw new AppError(400, 'Friend not found', 'Remove friend error');
   await friend.delete();
 
   // update friend count
@@ -376,7 +393,7 @@ friendController.removeFriend = catchAsync(async (req, res, next) => {
   await calculatorFriendCount(friendId);
 
   // response
-  return sendResponse(res, 200, true, friend, null, "Friend has been removed");
+  return sendResponse(res, 200, true, friend, null, 'Friend has been removed');
 });
 
 //

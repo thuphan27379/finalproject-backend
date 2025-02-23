@@ -82,139 +82,139 @@ Admin app - dashboard: (admin.domain.com)
 Site APIs:
 
 - @route GET /about OR /home
-- @description information of company
+- @desc information of company
 - @body
 - @access Public
 
 Auth APIs:
 
 - @route POST /auth/login
-- @description user log in with username and password
+- @desc user log in with username and password
 - @body {email, passsword}
 - @access Public
 
 User APIs:
 
 - @route GET /users/page=1?&limit=10
-- @description Get list of users with pagination
+- @desc Get list of users with pagination
 - @body
 - @access Login required
 
 - @route GET /users/me
-- @description Get current user info (my profile)
+- @desc Get current user info (my profile)
 - @body
 - @access Login required
 
 - @route GET /users/:id
-- @description Get user detail info by Id
+- @desc Get user detail info by Id
 - @body
 - @access Login required
 
 - @route POST /users
-- @description Register new user
+- @desc Register new user
 - @body {name, email, password}
 - @access Public
 
 - @route PUT /users/:id
-- @description Update user profile
+- @desc Update user profile
 - @body {name, avatar, aboutMe, city, country, company, jobtitle, fbLink, instagramLink, linkedInLink, twitterLink}
 - @access Login required
 
 Post APIs:
 
 - @route GET /posts/user/userId?page=1&limit=10
-- @description Get all posts a user can see with pagination
+- @desc Get all posts a user can see with pagination
 - @body
 - @access Login required
 
 - @route GET /posts/:id/comments
-- @description Get comments of a post
+- @desc Get comments of a post
 - @body
 - @access Login required
 
 - @route GET /posts/:id
-- @description Get a single post
+- @desc Get a single post
 - @body
 - @access Login required
 
 - @route POST /posts
-- @description Create a new post
+- @desc Create a new post
 - @body {content, image}
 - @access Login required
 
 - @route PUT /posts/:id
-- @description Update a post
+- @desc Update a post
 - @body {content, image}
 - @access Login required
 
 - @route DELETE /posts/:id
-- @description Delete a post
+- @desc Delete a post
 - @body
 - @access Login required
 
 Comment APIs:
 
 - @route GET /comments/:id
-- @description Get details of a comment
+- @desc Get details of a comment
 - @body
 - @access Login required
 
 - @route POST /comments
-- @description Create a new comment
+- @desc Create a new comment
 - @body {content, postId}
 - @access Login required
 
 - @route PUT /comment/:id
-- @description Update a comment
+- @desc Update a comment
 - @body
 - @access Login required
 
 - @route DELETE comments/:id
-- @description Delete a comment
+- @desc Delete a comment
 - @body
 - @access Login required
 
 Friend APIs:
 
 - @route GET /friends/requests/incoming
-- @description Get the list of received pending requests
+- @desc Get the list of received pending requests
 - @body
 - @access Login required
 
 - @route GET /friends/requests/outgoing
-- @description Get the list of sent pending requests
+- @desc Get the list of sent pending requests
 - @body
 - @access Login required
 
 - @route GET /friends/
-- @description Get the list of friends
+- @desc Get the list of friends
 - @body
 - @access Login required
 
 - @route POST /friends/requests
-- @description Send a friend request
+- @desc Send a friend request
 - @body {to: User ID}
 - @access Login required
 
 - @route PUT /friends/requests/:userId
-- @description Accept/Reject a received pending requests
+- @desc Accept/Reject a received pending requests
 - @body {status: 'accepted' or 'declined'}
 - @access Login required
 
 - @route DELETE /friends/requests/:userId
-- @description cancel a friend request
+- @desc cancel a friend request
 - @body
 - @access Login required
 
 - @route DELETE /friends/:userId
-- @description remove a friend
+- @desc remove a friend
 - @body
 - @access Login required
 
 Reaction APIs: posts OR comments
 
 - @route POST /reactions
-- @description Create a like/dislike
+- @desc Create a like/dislike
 - @body ["like", "dislike"]
 - @access Login required
 

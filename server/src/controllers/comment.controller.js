@@ -1,8 +1,8 @@
-const { sendResponse, AppError, catchAsync } = require("../helpers/utils");
-const Post = require("../models/Post");
-const User = require("../models/User");
-const Comment = require("../models/Comment");
-const Friend = require("../models/Friend");
+const { sendResponse, AppError, catchAsync } = require('../helpers/utils');
+const Post = require('../models/Post');
+const User = require('../models/User');
+const Comment = require('../models/Comment');
+const Friend = require('../models/Friend');
 
 //
 const commentController = {};
@@ -25,7 +25,7 @@ commentController.createNewComment = catchAsync(async (req, res, next) => {
   // business logic validation - kiem chung database check posts exists
   const post = Post.findById(postId);
   if (!post)
-    throw new AppError(400, "Post not found", "Create new comment error");
+    throw new AppError(400, 'Post not found', 'Create new comment error');
 
   // process - xu ly
   let comment = await Comment.create({
@@ -36,7 +36,7 @@ commentController.createNewComment = catchAsync(async (req, res, next) => {
 
   // update commentCount of the post
   await calculateCommentCount(postId);
-  comment = await comment.populate("author");
+  comment = await comment.populate('author');
 
   // response result, success or not
   return sendResponse(
@@ -45,7 +45,7 @@ commentController.createNewComment = catchAsync(async (req, res, next) => {
     true,
     { content },
     null,
-    "Create new comment successfully"
+    'Create new comment successfully'
   );
 });
 
@@ -67,8 +67,8 @@ commentController.updateSingleComment = catchAsync(async (req, res, next) => {
   if (!comment)
     throw new AppError(
       400,
-      "Comment not found or user not authorized",
-      "Update comment error"
+      'Comment not found or user not authorized',
+      'Update comment error'
     );
 
   // response result
@@ -78,7 +78,7 @@ commentController.updateSingleComment = catchAsync(async (req, res, next) => {
     true,
     comment,
     null,
-    "Update comment successfully"
+    'Update comment successfully'
   );
 });
 
@@ -98,8 +98,8 @@ commentController.deleteSingleComment = catchAsync(async (req, res, next) => {
   if (!comment)
     throw new AppError(
       400,
-      "Comment not found or user not authorized",
-      "Delete comment error"
+      'Comment not found or user not authorized',
+      'Delete comment error'
     );
   await calculateCommentCount(comment.post);
 
@@ -110,7 +110,7 @@ commentController.deleteSingleComment = catchAsync(async (req, res, next) => {
     true,
     comment,
     null,
-    "Delete comment successfully"
+    'Delete comment successfully'
   );
 });
 
@@ -121,11 +121,12 @@ commentController.getSingleComment = catchAsync(async (req, res, next) => {
   const commentId = req.params.id;
 
   // process
+  // biome-ignore lint/style/useConst: <explanation>
   let comment = await Comment.findById(commentId);
 
   // business logic validation
   if (!comment)
-    throw new AppError(400, "Comment not found", "Get single comment error");
+    throw new AppError(400, 'Comment not found', 'Get single comment error');
 
   // response result
   return sendResponse(
@@ -134,7 +135,7 @@ commentController.getSingleComment = catchAsync(async (req, res, next) => {
     true,
     comment,
     null,
-    "Get single comment successfully"
+    'Get single comment successfully'
   );
 });
 

@@ -1,85 +1,85 @@
-const express = require("express");
+const express = require('express');
 const router = express.Router();
-const { body, param } = require("express-validator");
+const { body, param } = require('express-validator');
 
-const authentication = require("../midlewares/authentication");
-const validators = require("../midlewares/validators");
-const postController = require("../controllers/post.controller");
-const { post } = require("./user.api");
+const authentication = require('../midlewares/authentication');
+const validators = require('../midlewares/validators');
+const postController = require('../controllers/post.controller');
+const { post } = require('./user.api');
 
 // @route GET/posts/user/userID?page=1&limit=10
-// @description get all posts and user can see with pagination
+// @desc get all posts and user can see with pagination
 // @access login required
 router.get(
-  "/user/:userId",
+  '/user/:userId',
   validators.validate([
-    param("userId").exists().isString().custom(validators.checkObjectId),
+    param('userId').exists().isString().custom(validators.checkObjectId),
   ]),
   postController.getAllPostsBySelectedUser
 );
 
 // @route GET/posts
-// @description get all posts for wall
+// @desc get all posts for wall
 // @access login required
-router.get("/", postController.getAllPosts);
+router.get('/', postController.getAllPosts);
 
 // @route POST/posts
-// @description create a new post
+// @desc create a new post
 // @body (content, image)
 // @access login required
 router.post(
-  "/",
+  '/',
   authentication.loginRequired,
-  validators.validate([body("content", "missing content").exists().notEmpty()]),
+  validators.validate([body('content', 'missing content').exists().notEmpty()]),
   postController.createPost
 );
 
 // @route PUT/posts/:id
-// @description update a post
+// @desc update a post
 // @body (content, image)
 // @access login required
 router.put(
-  "/:id",
+  '/:id',
   authentication.loginRequired,
   validators.validate([
-    param("id").exists().isString().custom(validators.checkObjectId),
+    param('id').exists().isString().custom(validators.checkObjectId),
   ]),
   postController.updateSinglePost
 );
 
 // @route DELETE/posts/:id
-// @description delete a post
+// @desc delete a post
 // @access login required
 router.delete(
-  "/:id",
+  '/:id',
   authentication.loginRequired,
   validators.validate([
-    param("id").exists().isString().custom(validators.checkObjectId),
+    param('id').exists().isString().custom(validators.checkObjectId),
   ]),
   postController.deleteSinglePost
 );
 
 // @route GET/posts/:id
-// @description get a single post
+// @desc get a single post
 // @access login required
 router.get(
-  "/:id",
+  '/:id',
   authentication.loginRequired,
   validators.validate([
-    param("id").exists().isString().custom(validators.checkObjectId),
+    param('id').exists().isString().custom(validators.checkObjectId),
   ]),
   postController.getSinglePost
 );
 
 // @route GET/posts/:id/comments
-// @description get comments of a post
+// @desc get comments of a post
 // @access login required
 // inside the function getSinglePost of postController
 router.get(
-  "/:id/comments",
+  '/:id/comments',
   authentication.loginRequired,
   validators.validate([
-    param("id").exists().isString().custom(validators.checkObjectId),
+    param('id').exists().isString().custom(validators.checkObjectId),
   ]),
   postController.getCommentsOfPost
 );

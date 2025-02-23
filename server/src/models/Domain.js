@@ -1,6 +1,6 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const jwt = require("jsonwebtoken");
+const jwt = require('jsonwebtoken');
 
 const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY;
 
@@ -8,8 +8,8 @@ const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY;
 // startup
 // domain
 const domainSchema = Schema({
-  topLevel: { type: String, required: true }, // .com .net .org ...
   name: { type: String, required: true }, // domain
+  topLevel: { type: String, required: true }, // .com .net .org ...
   subName: { type: String }, // www.subName.domain.com
   subDir: { type: String }, //  www.domain.com/subDir
   path: { type: String }, // www.domain.com/subDir/path
@@ -24,7 +24,8 @@ const domainSchema = Schema({
   isProject: { type: Boolean, default: true },
   isStartup: { type: Boolean, default: true },
   isSale: { type: Boolean, default: true },
+  isDeleted: { type: Boolean, default: false }, // soft delete
 });
 
-const Domain = mongoose.model("Domain", domainSchema);
+const Domain = mongoose.model('Domain', domainSchema);
 module.exports = Domain;

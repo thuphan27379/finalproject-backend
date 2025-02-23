@@ -1,8 +1,8 @@
-const { sendResponse, AppError, catchAsync } = require("../helpers/utils");
-const Post = require("../models/Post");
-const User = require("../models/User");
-const Comment = require("../models/Comment");
-const Friend = require("../models/Friend");
+const { sendResponse, AppError, catchAsync } = require('../helpers/utils');
+const Post = require('../models/Post');
+const User = require('../models/User');
+const Comment = require('../models/Comment');
+const Friend = require('../models/Friend');
 
 //
 const postController = {};
@@ -37,7 +37,7 @@ postController.createPost = catchAsync(async (req, res, next) => {
   await calculatePostCount(currentUserId);
 
   post = await post.save();
-  post = await post.populate("author");
+  post = await post.populate('author');
 
   // response result, success or not
   return sendResponse(
@@ -46,7 +46,7 @@ postController.createPost = catchAsync(async (req, res, next) => {
     true,
     post,
     null,
-    "Create new post successfully"
+    'Create new post successfully'
   );
 });
 
@@ -57,13 +57,15 @@ postController.updateSinglePost = catchAsync(async (req, res, next) => {
   const postId = req.params.id;
 
   // business logic validation - kiem chung database
+  // biome-ignore lint/style/useConst: <explanation>
   let post = await Post.findById(postId);
-  if (!post) throw new AppError(400, "Post is not found", "Update post error");
+  if (!post) throw new AppError(400, 'Post is not found', 'Update post error');
   if (!post.author.equals(currentUserId))
-    throw new AppError(400, "Only author can edit post", "Update post error");
+    throw new AppError(400, 'Only author can edit post', 'Update post error');
 
   // process - xu ly
-  const allows = ["content", "image"];
+  const allows = ['content', 'image'];
+  // biome-ignore lint/complexity/noForEach: <explanation>
   allows.forEach((field) => {
     if (req.body[field] !== undefined) {
       post[field] = req.body[field];
@@ -78,7 +80,7 @@ postController.updateSinglePost = catchAsync(async (req, res, next) => {
     true, // success post
     post, // data
     null, // error
-    "Update post successfully" // message
+    'Update post successfully' // message
   );
 });
 
@@ -91,11 +93,11 @@ postController.getSinglePost = catchAsync(async (req, res, next) => {
   // business logic validation - kiem chung database
   let post = await Post.findById(postId);
   if (!post)
-    throw new AppError(400, "Post is not found", "Get single post error");
+    throw new AppError(400, 'Post is not found', 'Get single post error');
 
   // process - xu ly
   post = post.toJSON();
-  post.comments = await Comment.find(post._id).populate("author");
+  post.comments = await Comment.find(post._id).populate('author');
 
   // response result, success or not
   return sendResponse(
@@ -104,7 +106,7 @@ postController.getSinglePost = catchAsync(async (req, res, next) => {
     true, // success
     post, // data
     null, // error
-    "Get single post successfully" // message
+    'Get single post successfully' // message
   );
 });
 
@@ -117,8 +119,9 @@ postController.getPosts = catchAsync(async (req, res, next) => {
   let { page, limit } = { ...req.query };
 
   // business logic validation - kiem chung database
+  // biome-ignore lint/style/useConst: <explanation>
   let user = await User.findById(userId); // check userId in database exist or not
-  if (!user) throw new AppError(400, "user is not found", "get posts error");
+  if (!user) throw new AppError(400, 'user is not found', 'get posts error');
 
   // post from group,  Retrieve user's group memberships
   const userGroups = await Group.find({
@@ -129,15 +132,18 @@ postController.getPosts = catchAsync(async (req, res, next) => {
   const groupIds = userGroups.map((group) => group._id);
 
   // process - xu ly
+  // biome-ignore lint/style/useNumberNamespace: <explanation>
   page = parseInt(page) || 1; // page
+  // biome-ignore lint/style/useNumberNamespace: <explanation>
   limit = parseInt(limit) || 10;
 
   // for find friends's ID to get friend's posts
   let userFriendIDs = await Friend.find({
     $or: [{ from: userId }, { to: userId }],
-    status: "accepted",
+    status: 'accepted',
   });
 
+  // biome-ignore lint/complexity/useOptionalChain: <explanation>
   if (userFriendIDs && userFriendIDs.length) {
     // lay ra ~ id only of friends for array userFriendIDs
     userFriendIDs = userFriendIDs.map((friend) => {
@@ -168,14 +174,15 @@ postController.getPosts = catchAsync(async (req, res, next) => {
   const offset = limit * (page - 1);
 
   // return posts and page
+  // biome-ignore lint/style/useConst: <explanation>
   let posts = await Post.find(filterCriteria)
     .sort({ createdAt: -1 })
     .skip(offset)
     .limit(limit)
-    .populate("author");
+    .populate('author');
 
   // response result, success or not
-  return sendResponse(res, 200, true, { posts, totalPages, count }, null, "");
+  return sendResponse(res, 200, true, { posts, totalPages, count }, null, '');
 });
 
 // delete a post // soft               && delete in postsByGroupId also ?
@@ -196,8 +203,8 @@ postController.deleteSinglePost = catchAsync(async (req, res, next) => {
   if (!post)
     throw new AppError(
       400,
-      "Post not found or user not authorized",
-      "Delete post error"
+      'Post not found or user not authorized',
+      'Delete post error'
     );
 
   await calculatePostCount(currentUserId);
@@ -209,7 +216,7 @@ postController.deleteSinglePost = catchAsync(async (req, res, next) => {
     true, // success post,
     post, // data
     null, // error
-    "Delete post successfully" // message
+    'Delete post successfully' // message
   );
 });
 
@@ -217,7 +224,9 @@ postController.deleteSinglePost = catchAsync(async (req, res, next) => {
 postController.getCommentsOfPost = catchAsync(async (req, res, next) => {
   // get data from requests
   const postId = req.params.id;
+  // biome-ignore lint/style/useNumberNamespace: <explanation>
   const page = parseInt(req.query.page) || 1;
+  // biome-ignore lint/style/useNumberNamespace: <explanation>
   const limit = parseInt(req.query.limit) || 10;
 
   // process
@@ -229,7 +238,7 @@ postController.getCommentsOfPost = catchAsync(async (req, res, next) => {
     .sort({ createdAt: -1 })
     .skip(offset)
     .limit(limit)
-    .populate("author");
+    .populate('author');
 
   // response result
   return sendResponse(
@@ -238,7 +247,7 @@ postController.getCommentsOfPost = catchAsync(async (req, res, next) => {
     true,
     { comments, totalPages, count },
     null,
-    "Get comments of post successfully"
+    'Get comments of post successfully'
   );
 });
 
@@ -250,7 +259,9 @@ postController.getAllPosts = catchAsync(async (req, res, next) => {
   // business logic validation - kiem chung database
 
   // process - xu ly
+  // biome-ignore lint/style/useNumberNamespace: <explanation>
   page = parseInt(page) || 1; // page
+  // biome-ignore lint/style/useNumberNamespace: <explanation>
   limit = parseInt(limit) || 10;
 
   // for finding posts
@@ -270,16 +281,17 @@ postController.getAllPosts = catchAsync(async (req, res, next) => {
   const offset = limit * (page - 1);
 
   // return posts and page
+  // biome-ignore lint/style/useConst: <explanation>
   let posts = await Post.find(filterCriteria)
     .sort({
       createdAt: -1,
     })
     .skip(offset)
     .limit(limit)
-    .populate("author");
+    .populate('author');
 
   // response result, success or not
-  return sendResponse(res, 200, true, { posts, totalPages, count }, null, "");
+  return sendResponse(res, 200, true, { posts, totalPages, count }, null, '');
 });
 
 // get all posts by selectedUser
@@ -293,7 +305,9 @@ postController.getAllPostsBySelectedUser = catchAsync(
     // business logic validation - kiem chung database
 
     // process - xu ly
+    // biome-ignore lint/style/useNumberNamespace: <explanation>
     page = parseInt(page) || 1; // page
+    // biome-ignore lint/style/useNumberNamespace: <explanation>
     limit = parseInt(limit) || 10;
 
     // for finding posts
@@ -308,14 +322,15 @@ postController.getAllPostsBySelectedUser = catchAsync(
     const offset = limit * (page - 1);
 
     // return posts and page
+    // biome-ignore lint/style/useConst: <explanation>
     let posts = await Post.find(filterCriteria)
       .sort({ createdAt: -1 })
       .skip(offset)
       .limit(limit)
-      .populate("author");
+      .populate('author');
 
     // response result, success or not
-    return sendResponse(res, 200, true, { posts, totalPages, count }, null, "");
+    return sendResponse(res, 200, true, { posts, totalPages, count }, null, '');
   }
 );
 

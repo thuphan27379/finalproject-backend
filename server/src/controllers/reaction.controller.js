@@ -1,6 +1,6 @@
-const { default: mongoose } = require("mongoose");
-const Reaction = require("../models/Reaction");
-const { sendResponse, AppError, catchAsync } = require("../helpers/utils");
+const { default: mongoose } = require('mongoose');
+const Reaction = require('../models/Reaction');
+const { sendResponse, AppError, catchAsync } = require('../helpers/utils');
 
 //
 const reactionController = {};
@@ -15,15 +15,15 @@ const calculateReactions = async (targetId, targetType) => {
     },
     {
       $group: {
-        _id: "$targetId",
+        _id: '$targetId',
         like: {
           $sum: {
-            $cond: [{ $eq: ["$emoji", "like"] }, 1, 0],
+            $cond: [{ $eq: ['$emoji', 'like'] }, 1, 0],
           },
         },
         dislike: {
           $sum: {
-            $cond: [{ $eq: ["$emoji", "dislike"] }, 1, 0],
+            $cond: [{ $eq: ['$emoji', 'dislike'] }, 1, 0],
           },
         },
       },
@@ -32,7 +32,9 @@ const calculateReactions = async (targetId, targetType) => {
 
   // update UI & save
   const reactions = {
+    // biome-ignore lint/complexity/useOptionalChain: <explanation>
     like: (stats[0] && stats[0].like) || 0,
+    // biome-ignore lint/complexity/useOptionalChain: <explanation>
     dislike: (stats[0] && stats[0].dislike) || 0,
   };
   await mongoose.model(targetType).findByIdAndUpdate(targetId, { reactions });
@@ -50,7 +52,7 @@ reactionController.saveReaction = catchAsync(async (req, res, next) => {
   // check targetType exists
   const targetObj = await mongoose.model(targetType).findById(targetId); // tra ve la Post hoac Comment
   if (!targetObj)
-    throw new AppError(400, `${targetType} not found`, "Create reaction error");
+    throw new AppError(400, `${targetType} not found`, 'Create reaction error');
 
   // find the reaction if exists
   let reaction = await Reaction.findOne({
@@ -90,7 +92,7 @@ reactionController.saveReaction = catchAsync(async (req, res, next) => {
     true,
     reactions,
     null,
-    "Save reaction successfully"
+    'Save reaction successfully'
   );
 });
 
